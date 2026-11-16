@@ -1,0 +1,21 @@
+node_modules/
+out/
+release/
+dist/
+*.tsbuildinfo
+test-results/
+# Generated at build time by scripts/licenses.mjs.
+resources/licenses/THIRD_PARTY_LICENSES.txt
+playwright-report/
+coverage/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+# Engine binaries are provisioned per platform, never committed.
+resources/engines/*/*
+!resources/engines/*/.gitkeep
+
+# Local build caches and QA profiles (never committed).
+.qa/

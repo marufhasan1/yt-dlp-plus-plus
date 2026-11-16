@@ -1,0 +1,60 @@
+{
+  "name": "mediaflow",
+  "productName": "MediaFlow",
+  "version": "1.0.0",
+  "description": "Cross-platform desktop media downloader built on yt-dlp and FFmpeg.",
+  "author": "MediaFlow Contributors",
+  "license": "MIT",
+  "private": true,
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "electron-vite build && playwright test",
+    "dist": "npm run build && node scripts/dist.mjs",
+    "dist:dir": "npm run build && node scripts/dist.mjs --dir"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.11",
+    "openpgp": "^6.3.2",
+    "yauzl": "^3.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@lucide/vue": "^1.66.0",
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.5",
+    "@types/yauzl": "^3.4.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "@vue/tsconfig": "^0.9.1",
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.0",
+    "pinia": "^4.1.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0",
+    "vue-tsc": "^3.3.14"
+  }
+}

@@ -1,0 +1,170 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Semantic colour tokens. Components use these (bg-surface, text-fg-muted, …)
+ * instead of raw palette colours so both themes stay consistent.
+ * --bg must match WINDOW_BACKGROUND in shared/constants/app.ts.
+ */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --surface-3: #e7eaef;
+  --border: #e2e5ea;
+  --border-strong: #cfd4dc;
+  --fg: #14171c;
+  --fg-muted: #555d6b;
+  --fg-subtle: #858c98;
+  --accent: #2f6bed;
+  --accent-hover: #2459cc;
+  --accent-fg: #ffffff;
+  --accent-soft: #e9f0fe;
+  --danger: #d93a3a;
+  --danger-soft: #fdecec;
+  --success: #188a55;
+  --success-soft: #e6f6ee;
+  --warning: #b56b00;
+  --warning-soft: #fdf3e2;
+  --shadow-color: 220 20% 20%;
+}
+
+.dark {
+  --bg: #0e1014;
+  --surface: #15181e;
+  --surface-2: #1b1f26;
+  --surface-3: #232831;
+  --border: #252a33;
+  --border-strong: #343b46;
+  --fg: #e8eaee;
+  --fg-muted: #9ba2ae;
+  --fg-subtle: #69707c;
+  --accent: #5b8cff;
+  --accent-hover: #7aa2ff;
+  --accent-fg: #0b0e14;
+  --accent-soft: rgb(91 140 255 / 0.14);
+  --danger: #f06363;
+  --danger-soft: rgb(240 99 99 / 0.14);
+  --success: #3ec486;
+  --success-soft: rgb(62 196 134 / 0.14);
+  --warning: #f0b04a;
+  --warning-soft: rgb(240 176 74 / 0.14);
+  --shadow-color: 220 40% 2%;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  --font-sans:
+    'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
+    'Ubuntu', 'Cantarell', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 1px 1px hsl(var(--shadow-color) / 0.04);
+  --shadow-raised: 0 8px 24px -6px hsl(var(--shadow-color) / 0.25), 0 2px 6px hsl(var(--shadow-color) / 0.1);
+}
+
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Desktop apps should not let users drag-select the chrome. Inputs and content opt back in. */
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  .selectable {
+    user-select: text;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--surface-3);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-strong);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Route transition: a short fade with a slight rise. */
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

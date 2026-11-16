@@ -1,0 +1,6 @@
+* text=auto eol=lf
+# Fixtures are byte-exact (signed checksum lists, binary signatures, captured tool output).
+tests/fixtures/** -text
+*.png binary
+*.ico binary
+*.icns binary

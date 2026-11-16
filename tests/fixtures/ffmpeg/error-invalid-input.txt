@@ -1,0 +1,4 @@
+[mp3 @ 00000205a74c5840] Failed to find two consecutive MPEG audio frames.
+[in#0 @ 00000205a74c5580] Error opening input: Invalid data found when processing input
+Error opening input file file:<scratch>/conv/broken.mp3.
+Error opening input files: Invalid data found when processing input

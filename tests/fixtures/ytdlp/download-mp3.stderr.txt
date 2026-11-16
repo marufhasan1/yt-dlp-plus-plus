@@ -1,0 +1,11 @@
+WARNING: Unknown codec iamf.001.001.Opus
+[MF-PP] started|FixupM4a
+[MF-PP] finished|FixupM4a
+[MF-PP] started|ExtractAudio
+[MF-PP] finished|ExtractAudio
+[MF-PP] started|Metadata
+[MF-PP] finished|Metadata
+[MF-PP] started|EmbedThumbnail
+[MF-PP] finished|EmbedThumbnail
+[MF-PP] started|MoveFiles
+[MF-PP] finished|MoveFiles

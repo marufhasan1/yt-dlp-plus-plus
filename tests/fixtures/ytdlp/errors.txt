@@ -1,0 +1,4 @@
+ERROR: [youtube] aaaaaaaaaaa: This video is unavailable
+ERROR: [generic] not-a-video: Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: Not Found>)
+ERROR: [generic] watch: Unable to download webpage: HTTPSConnection(host='nonexistent-host-mediaflow.invalid', port=443): Failed to resolve 'nonexistent-host-mediaflow.invalid' ([Errno 11001] getaddrinfo failed) (caused by TransportError("HTTPSConnection(host='nonexistent-host-mediaflow.invalid', port=443): Failed to resolve 'nonexistent-host-mediaflow.invalid' ([Errno 11001] getaddrinfo failed)"))
+ERROR: [youtube:tab] PLwiyx1dc3P2JR9N8gQaQN_BCvlSlap7re: YouTube said: The playlist does not exist.
