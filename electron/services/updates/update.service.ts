@@ -39,14 +39,14 @@ const PRIMARY: Record<InstallTarget, EngineId> = { 'yt-dlp': 'yt-dlp', ffmpeg: '
 const TARGET_ENGINES: Record<InstallTarget, EngineId[]> = { 'yt-dlp': ['yt-dlp'], ffmpeg: ['ffmpeg', 'ffprobe'], deno: ['deno'] }
 const DOWNLOAD_STAGES: readonly InstallStage[] = ['resolving', 'downloading']
 const INSTALL_STAGES: readonly InstallStage[] = ['verifying', 'extracting', 'installing']
-const LABELS: Record<UpdateComponentId, string> = { app: 'MediaFlow', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', deno: 'Deno' }
+const LABELS: Record<UpdateComponentId, string> = { app: 'YT-DLP++', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', deno: 'Deno' }
 
 type AppPhase = 'idle' | 'downloading' | 'ready' | 'failed'
 
 /** Set when the app update installer is started; checked at the next start. */
 const PENDING_APP_UPDATE = 'updates.pendingAppUpdate'
 
-/** A notice for the renderer, e.g. a new MediaFlow version found by an automatic check. */
+/** A notice for the renderer, e.g. a new YT-DLP++ version found by an automatic check. */
 export interface UpdateNotice {
   component: UpdateComponentId
   version: string
@@ -103,7 +103,7 @@ export class UpdateService {
         errorMessage: succeeded ? null : `Still running ${this.deps.appVersion}: the installer did not complete.`
       })
       if (succeeded) this.updated.add('app')
-      this.deps.logger.info(succeeded ? `Updated MediaFlow from ${from} to ${to}` : `MediaFlow update to ${to} did not complete`)
+      this.deps.logger.info(succeeded ? `Updated YT-DLP++ from ${from} to ${to}` : `YT-DLP++ update to ${to} did not complete`)
     } catch (error) {
       this.deps.logger.warn('Unreadable pending app update record', error)
     }
@@ -227,7 +227,7 @@ export class UpdateService {
       this.deps.checks.saveResult(result)
       this.stored.set('app', result)
       if (release) {
-        this.deps.logger.info(`MediaFlow ${release.version} is available (installed ${this.deps.appVersion})`)
+        this.deps.logger.info(`YT-DLP++ ${release.version} is available (installed ${this.deps.appVersion})`)
         if (reason === 'scheduled' && release.version !== known && this.deps.settings().appUpdateNotifications) {
           this.events.emit('notice', { component: 'app', version: release.version, kind: 'available', message: null } satisfies UpdateNotice)
         }
@@ -371,7 +371,7 @@ export class UpdateService {
     // After a restart only the last result is known; the updater needs a fresh check before downloading.
     if (!this.appRelease) await this.checkApp()
     if (!this.appRelease) {
-      throw new AppError('VALIDATION_FAILED', this.failures.get('app') ?? this.stored.get('app')?.errorMessage ?? 'MediaFlow is up to date.')
+      throw new AppError('VALIDATION_FAILED', this.failures.get('app') ?? this.stored.get('app')?.errorMessage ?? 'YT-DLP++ is up to date.')
     }
     if (this.appPhase === 'downloading' || this.appPhase === 'ready') return
     this.appPhase = 'downloading'
@@ -389,13 +389,13 @@ export class UpdateService {
       })
       this.appPhase = 'ready'
       this.appProgress = 100
-      this.deps.logger.info(`MediaFlow ${this.appRelease.version} downloaded and verified; ready to install`)
+      this.deps.logger.info(`YT-DLP++ ${this.appRelease.version} downloaded and verified; ready to install`)
     } catch (error) {
       const message = describeAppUpdateError(error)
       this.appPhase = 'failed'
       this.appProgress = null
       this.failures.set('app', message)
-      this.deps.logger.error(`Downloading MediaFlow ${this.appRelease.version} failed`, error)
+      this.deps.logger.error(`Downloading YT-DLP++ ${this.appRelease.version} failed`, error)
       this.deps.history.record({ component: 'app', previousVersion: this.deps.appVersion, newVersion: this.appRelease.version, status: 'failed', errorMessage: message })
       throw new AppError('OPERATION_FAILED', message, { cause: error })
     } finally {
@@ -410,7 +410,7 @@ export class UpdateService {
   /** Quits and installs. Running downloads are paused by the normal shutdown and offered for resuming afterwards. */
   installApp(): void {
     if (this.appPhase !== 'ready' || !this.appRelease) throw new AppError('VALIDATION_FAILED', 'The update has not been downloaded yet.')
-    this.deps.logger.info(`Installing MediaFlow ${this.appRelease.version} and restarting`)
+    this.deps.logger.info(`Installing YT-DLP++ ${this.appRelease.version} and restarting`)
     // The outcome is recorded at the next start, when the running version shows whether it worked.
     this.deps.checks.setState(PENDING_APP_UPDATE, JSON.stringify({ from: this.deps.appVersion, to: this.appRelease.version }))
     this.deps.app.install()

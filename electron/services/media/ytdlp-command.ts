@@ -4,6 +4,7 @@ import {
   FINAL_PATH_TEMPLATE,
   POSTPROCESS_PROGRESS_TEMPLATE
 } from '../download/download-progress'
+import { compareVersions } from '../updates/versions'
 import type { DownloadPlan } from './format-selection'
 
 /** Resolved engine locations for one yt-dlp invocation. */
@@ -15,7 +16,12 @@ export interface EngineRuntime {
   deno: string | null
   /** Connection settings from Settings → Advanced; defaults apply when omitted. */
   network?: NetworkOptions
+  /** Version of the yt-dlp at `ytdlp`, when known (decides which options it understands). */
+  ytdlpVersion?: string | null
 }
+
+/** First yt-dlp release with --no-plugin-dirs (Changelog 2024.10.22, #11277). */
+const NO_PLUGIN_DIRS_SINCE = '2024.10.22'
 
 export interface NetworkOptions {
   /** Seconds to wait for a response. */
@@ -33,12 +39,14 @@ export const YTDLP_ENV: Record<string, string> = { PYTHONIOENCODING: 'utf-8', PY
 
 /**
  * Arguments every invocation shares. `--ignore-config` keeps a user's global
- * yt-dlp configuration from changing MediaFlow's behaviour.
+ * yt-dlp configuration from changing YT-DLP++'s behaviour.
  */
 export function commonArgs(runtime: EngineRuntime): string[] {
   const network = runtime.network ?? DEFAULT_NETWORK
   return [
     '--ignore-config',
+    // Plugins from the user's yt-dlp folders would run inside YT-DLP++'s downloads; --ignore-config does not stop them.
+    ...(runtime.ytdlpVersion && compareVersions(runtime.ytdlpVersion, NO_PLUGIN_DIRS_SINCE) >= 0 ? ['--no-plugin-dirs'] : []),
     '--no-colors',
     '--encoding',
     'utf-8',

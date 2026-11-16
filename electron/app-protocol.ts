@@ -4,13 +4,13 @@ import { protocol } from 'electron'
 import type { Logger } from './utils/logger'
 
 /**
- * The UI is served from app://mediaflow/ instead of file://. Pages loaded from
+ * The UI is served from app://ytdlpp/ instead of file://. Pages loaded from
  * file:// share one origin with every local file and get extra privileges;
  * this scheme gives the renderer its own origin (CSP 'self' means only the
  * app's files) and lets the grantFileProtocolExtraPrivileges fuse stay off.
  */
 export const APP_SCHEME = 'app'
-export const APP_HOST = 'mediaflow'
+export const APP_HOST = 'ytdlpp'
 export const APP_ENTRY_URL = `${APP_SCHEME}://${APP_HOST}/index.html`
 
 const CONTENT_TYPES: Record<string, string> = {
@@ -62,7 +62,7 @@ export function resolveAppAsset(root: string, raw: string): string | null {
   return extname(file).toLowerCase() in CONTENT_TYPES ? file : null
 }
 
-/** Serves the renderer build from `root` on app://mediaflow/. */
+/** Serves the renderer build from `root` on app://ytdlpp/. */
 export function handleAppScheme(root: string, logger: Logger): void {
   protocol.handle(APP_SCHEME, async (request) => {
     const file = resolveAppAsset(root, request.url)

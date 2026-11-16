@@ -11,7 +11,7 @@ const { tmpdir } = require('node:os')
 const { join } = require('node:path')
 
 // Keep Electron's profile for this tool out of the user's application data.
-app.setPath('userData', join(tmpdir(), 'mediaflow-render-icon'))
+app.setPath('userData', join(tmpdir(), 'ytdlpp-render-icon'))
 app.disableHardwareAcceleration()
 
 const root = join(__dirname, '..')

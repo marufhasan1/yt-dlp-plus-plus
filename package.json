@@ -1,9 +1,9 @@
 {
-  "name": "mediaflow",
-  "productName": "MediaFlow",
+  "name": "yt-dlp-plus-plus",
+  "productName": "YT-DLP++",
   "version": "1.0.0",
   "description": "Cross-platform desktop media downloader built on yt-dlp and FFmpeg.",
-  "author": "MediaFlow Contributors",
+  "author": "YT-DLP++ Contributors",
   "license": "MIT",
   "private": true,
   "main": "./out/main/index.js",
@@ -22,7 +22,11 @@
     "test:watch": "vitest",
     "test:e2e": "electron-vite build && playwright test",
     "dist": "npm run build && node scripts/dist.mjs",
-    "dist:dir": "npm run build && node scripts/dist.mjs --dir"
+    "dist:dir": "npm run build && node scripts/dist.mjs --dir",
+    "licenses": "node scripts/licenses.mjs",
+    "licenses:check": "node scripts/licenses.mjs --check",
+    "verify:package": "node scripts/verify-package.cjs --all",
+    "icons": "electron scripts/render-icon.cjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
@@ -42,7 +46,7 @@
     "@vitejs/plugin-vue": "^6.0.10",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/tsconfig": "^0.9.1",
-    "electron": "^45.2.1",
+    "electron": "^45.3.3",
     "electron-builder": "^26.18.0",
     "electron-vite": "^6.0.0",
     "eslint": "^10.14.0",

@@ -15,7 +15,7 @@ const sharedAlias = { '@shared': resolve(__dirname, 'shared') }
 function contentSecurityPolicy(): Plugin {
   let isDev = false
   return {
-    name: 'mediaflow:csp',
+    name: 'ytdlpp:csp',
     configResolved(config) {
       isDev = config.command === 'serve'
     },
@@ -51,7 +51,7 @@ function contentSecurityPolicy(): Plugin {
  */
 function bundledPackages(target: 'main' | 'preload' | 'renderer'): Plugin {
   return {
-    name: 'mediaflow:bundled-packages',
+    name: 'ytdlpp:bundled-packages',
     apply: 'build',
     generateBundle(_options, bundle) {
       const packages = new Set<string>()

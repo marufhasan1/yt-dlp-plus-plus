@@ -13,7 +13,7 @@ const engines = useEnginesStore()
 const updates = useUpdatesStore()
 const downloads = useDownloadsStore()
 const converter = useConverterStore()
-const productName = computed(() => appStore.info?.name ?? 'MediaFlow')
+const productName = computed(() => appStore.info?.name ?? 'YT-DLP++')
 const version = computed(() => (appStore.info ? `v${appStore.info.version}` : ''))
 </script>
 

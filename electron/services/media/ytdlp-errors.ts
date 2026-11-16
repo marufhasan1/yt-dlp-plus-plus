@@ -21,7 +21,7 @@ const RULES: { code: DownloadErrorCode; pattern: RegExp; message: string }[] = [
   {
     code: 'PERMISSION_DENIED',
     pattern: /Permission denied|Errno 13|Access is denied/i,
-    message: 'MediaFlow is not allowed to write to the download folder. Choose another folder in Settings.'
+    message: 'YT-DLP++ is not allowed to write to the download folder. Choose another folder in Settings.'
   },
   {
     code: 'PRIVATE_VIDEO',
@@ -31,7 +31,7 @@ const RULES: { code: DownloadErrorCode; pattern: RegExp; message: string }[] = [
   {
     code: 'AGE_RESTRICTED',
     pattern: /confirm your age|age[- ]restricted|inappropriate for some users/i,
-    message: 'This video is age-restricted and requires signing in, which MediaFlow does not do.'
+    message: 'This video is age-restricted and requires signing in, which YT-DLP++ does not do.'
   },
   {
     code: 'BOT_CHECK',

@@ -4,7 +4,7 @@ import { createProxyAuthFetch, type ProxyLogin, type RequestFactory } from './pr
 import type { FetchFn } from './trusted-http'
 
 /**
- * Chromium proxy rules for MediaFlow's own requests (thumbnails, engine
+ * Chromium proxy rules for YT-DLP++'s own requests (thumbnails, engine
  * downloads), matching what yt-dlp is given. Chromium has no "socks5h"/"socks4a":
  * its SOCKS5 already resolves names through the proxy, and SOCKS4 is the closest.
  */
@@ -37,7 +37,7 @@ export function proxyLoginFor(proxy: string | null): ProxyLogin | null {
 }
 
 /**
- * fetch for MediaFlow's own requests: Electron's net.fetch normally, or a
+ * fetch for YT-DLP++'s own requests: Electron's net.fetch normally, or a
  * net.request-based fetch that can answer the proxy's challenge when the
  * configured proxy needs a user name and password.
  */

@@ -10,7 +10,7 @@ export interface EngineVersion {
 
 export type ProbeResult = { ok: true; version: EngineVersion; problems: EngineProblem[] } | { ok: false; problem: EngineProblem }
 
-/** Encoders needed for the audio formats MediaFlow offers (MP3, M4A, WAV, FLAC, OPUS). */
+/** Encoders needed for the audio formats YT-DLP++ offers (MP3, M4A, WAV, FLAC, OPUS). */
 export const REQUIRED_ENCODERS = ['libmp3lame', 'aac', 'pcm_s16le', 'flac', 'libopus'] as const
 /** Muxers needed to write MP4, WebM, MKV and the audio containers. */
 export const REQUIRED_MUXERS = ['mp4', 'webm', 'matroska', 'ipod', 'mp3', 'wav', 'flac', 'opus'] as const
@@ -91,7 +91,7 @@ export class EngineProber {
     return { ok: true, version, problems: [] }
   }
 
-  /** Also checks that the encoders and muxers MediaFlow relies on are present. */
+  /** Also checks that the encoders and muxers YT-DLP++ relies on are present. */
   async probeFfmpeg(path: string): Promise<ProbeResult> {
     const result = await this.runVersion(path, ['-hide_banner', '-version'], 30_000)
     if (!result.ok) return result

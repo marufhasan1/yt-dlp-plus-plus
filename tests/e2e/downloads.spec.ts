@@ -61,7 +61,7 @@ const PLAN = JSON.stringify({
 async function seed(rows: Seed[]): Promise<void> {
   const first = await launch()
   await first.app.close()
-  const db = new Database(join(userDataDir, 'mediaflow.db'))
+  const db = new Database(join(userDataDir, 'ytdlpp.db'))
   const insert = db.prepare(
     `INSERT INTO downloads (id, url, title, media_type, output_format, quality, output_path, status, progress, downloaded_bytes,
                             total_bytes, created_at, completed_at, error_message, error_code, plan_json, dismissed_at, source_id)
@@ -92,7 +92,7 @@ async function seed(rows: Seed[]): Promise<void> {
 }
 
 function row(id: string): Record<string, unknown> {
-  const db = new Database(join(userDataDir, 'mediaflow.db'), { readonly: true })
+  const db = new Database(join(userDataDir, 'ytdlpp.db'), { readonly: true })
   const result = db.prepare('SELECT * FROM downloads WHERE id = ?').get(id) as Record<string, unknown>
   db.close()
   return result
@@ -101,7 +101,7 @@ function row(id: string): Record<string, unknown> {
 const uuid = (n: number) => `5f0c7a1e-3b7d-4c1a-9a6e-${String(n).padStart(12, '0')}`
 
 test.beforeEach(() => {
-  userDataDir = mkdtempSync(join(tmpdir(), 'mediaflow-e2e-dl-'))
+  userDataDir = mkdtempSync(join(tmpdir(), 'ytdlpp-e2e-dl-'))
 })
 
 test.afterEach(async () => {
@@ -124,11 +124,11 @@ test('offers downloads interrupted by the last session for resuming', async () =
   const { app, page, consoleErrors } = await launch()
   await page.getByTestId('nav-downloads').click()
   const banner = page.getByTestId('recovery-banner')
-  await expect(banner).toContainText('2 downloads were interrupted when MediaFlow closed')
+  await expect(banner).toContainText('2 downloads were interrupted when YT-DLP++ closed')
 
   const interrupted = page.getByTestId(`download-${uuid(1)}`)
   await expect(interrupted).toHaveAttribute('data-status', 'paused')
-  await expect(interrupted.getByTestId('paused-info')).toContainText('Interrupted when MediaFlow closed')
+  await expect(interrupted.getByTestId('paused-info')).toContainText('Interrupted when YT-DLP++ closed')
   await expect(interrupted.getByTestId('paused-info')).toContainText('42%')
   await expect(page.getByTestId(`download-${uuid(3)}`).getByTestId('paused-info')).toContainText('Paused — partial download kept')
   await expect(page.getByTestId(`download-${uuid(4)}`)).toHaveAttribute('data-status', 'failed')
@@ -271,7 +271,7 @@ test('guards download-management IPC', async () => {
   const { app, page } = await launch()
   const results = await page.evaluate(async () => {
     type Result = Promise<unknown>
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as {
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as {
       downloads: { pause(id: unknown): Result; resume(id: unknown): Result }
       history: { list(query: unknown): Result; delete(id: unknown, deleteFile: unknown): Result; showInFolder(id: unknown): Result }
       settings: { update(patch: unknown): Result }
@@ -307,7 +307,7 @@ test('guards download-management IPC', async () => {
   await app.close()
 })
 
-test('saves advanced settings and applies the proxy to MediaFlow’s own requests', async () => {
+test('saves advanced settings and applies the proxy to YT-DLP++’s own requests', async () => {
   let { app, page, consoleErrors } = await launch()
   await page.getByTestId('nav-settings').click()
   await page.getByTestId('setting-retries').locator('select').selectOption('5')

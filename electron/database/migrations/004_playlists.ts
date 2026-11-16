@@ -8,7 +8,7 @@ export const playlists: Migration = {
     db.exec(`
       -- "<extractor>:<playlist id>": analysing the same playlist again refreshes it instead of duplicating it.
       ALTER TABLE playlists ADD COLUMN source_id TEXT;
-      -- 1 when the playlist has more entries than MediaFlow lists.
+      -- 1 when the playlist has more entries than YT-DLP++ lists.
       ALTER TABLE playlists ADD COLUMN truncated INTEGER NOT NULL DEFAULT 0 CHECK (truncated IN (0, 1));
       ALTER TABLE playlists ADD COLUMN updated_at TEXT;
       CREATE UNIQUE INDEX idx_playlists_source ON playlists (source_id) WHERE source_id IS NOT NULL;

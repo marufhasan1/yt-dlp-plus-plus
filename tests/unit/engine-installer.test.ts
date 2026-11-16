@@ -48,7 +48,7 @@ let engineDir: string
 let stagingRoot: string
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'mediaflow-installer-'))
+  root = mkdtempSync(join(tmpdir(), 'ytdlpp-installer-'))
   engineDir = join(root, 'engines', target.key)
   stagingRoot = join(root, 'engines', '.staging')
   installedCopiesFail = false

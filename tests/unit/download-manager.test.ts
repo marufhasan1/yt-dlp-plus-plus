@@ -146,7 +146,7 @@ async function settle(downloads: DownloadManager, id: string, statuses: Download
 const tempOf = (id: string) => join(root, 'tmp', id)
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'mediaflow-dm-'))
+  root = mkdtempSync(join(tmpdir(), 'ytdlpp-dm-'))
   files = 0
   db = openDatabase(':memory:', silentLogger)
   repository = new DownloadRepository(db)
@@ -180,9 +180,10 @@ describe('DownloadManager', () => {
 
     // Engines were leased for the run and released after.
     expect(acquire).toHaveBeenCalledWith(['yt-dlp', 'ffmpeg', 'ffprobe', 'deno'])
-    expect(release).toHaveBeenCalledOnce()
+    // Both happen in the run's clean-up, just after "completed" is reported.
+    await vi.waitFor(() => expect(release).toHaveBeenCalledOnce())
     // The per-job scratch folder is gone.
-    expect(existsSync(tempOf(queued.id))).toBe(false)
+    await vi.waitFor(() => expect(existsSync(tempOf(queued.id))).toBe(false))
     // Persisted.
     expect(repository.get(queued.id)?.job).toMatchObject({ status: 'completed', progress: 100, sourceId: queued.sourceId })
     expect(spawned[0]?.slice(-2)).toEqual(['--', 'https://www.youtube.com/watch?v=aqz-KE-bpKQ'])
@@ -380,8 +381,8 @@ describe('restart recovery', () => {
     scripts = ['hang']
     const crashed = manager()
     const { id } = await crashed.start(REQUEST)
-    await vi.waitFor(() => expect(existsSync(join(tempOf(id), '.mediaflow-owner.json'))).toBe(true))
-    expect(JSON.parse(readFileSync(join(tempOf(id), '.mediaflow-owner.json'), 'utf8'))).toMatchObject({ pid: 4242, executable: '/engines/yt-dlp' })
+    await vi.waitFor(() => expect(existsSync(join(tempOf(id), '.ytdlpp-owner.json'))).toBe(true))
+    expect(JSON.parse(readFileSync(join(tempOf(id), '.ytdlpp-owner.json'), 'utf8'))).toMatchObject({ pid: 4242, executable: '/engines/yt-dlp' })
 
     // The app dies; the fake OS still runs that yt-dlp. The next start stops it before anything resumes.
     runningOrphans.add(4242)
@@ -389,7 +390,7 @@ describe('restart recovery', () => {
     after.initialize()
     await after.cleanTemp()
     expect(killOrphan).toHaveBeenCalledWith(4242)
-    expect(existsSync(join(tempOf(id), '.mediaflow-owner.json'))).toBe(false)
+    expect(existsSync(join(tempOf(id), '.ytdlpp-owner.json'))).toBe(false)
     expect(after.get(id)).toMatchObject({ status: 'paused', interrupted: true })
 
     // A paused job's folder keeps its partial files but no owner record.
@@ -398,7 +399,7 @@ describe('restart recovery', () => {
     await settle(after, id, ['downloading'])
     await after.pause(id)
     await settle(after, id, ['paused'])
-    await vi.waitFor(() => expect(existsSync(join(tempOf(id), '.mediaflow-owner.json'))).toBe(false))
+    await vi.waitFor(() => expect(existsSync(join(tempOf(id), '.ytdlpp-owner.json'))).toBe(false))
     expect(existsSync(tempOf(id))).toBe(true)
     await crashed.cancel(id).catch(() => {})
   })

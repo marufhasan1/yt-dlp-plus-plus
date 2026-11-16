@@ -24,4 +24,4 @@ export function errorMessage(error: unknown): string {
 }
 
 /** The typed bridge exposed by the preload script. */
-export const bridge = window.mediaflow
+export const bridge = window.ytdlpp

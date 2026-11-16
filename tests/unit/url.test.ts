@@ -25,16 +25,16 @@ describe('isSafeExternalUrl', () => {
 describe('isRendererUrl', () => {
   const appSource: RendererSource = { kind: 'app', root: join(process.cwd(), 'out', 'renderer') }
 
-  it('accepts the UI on app://mediaflow/index.html, including router hashes', () => {
-    expect(isRendererUrl('app://mediaflow/index.html', appSource)).toBe(true)
-    expect(isRendererUrl('app://mediaflow/index.html#/settings', appSource)).toBe(true)
+  it('accepts the UI on app://ytdlpp/index.html, including router hashes', () => {
+    expect(isRendererUrl('app://ytdlpp/index.html', appSource)).toBe(true)
+    expect(isRendererUrl('app://ytdlpp/index.html#/settings', appSource)).toBe(true)
   })
 
   it('rejects local files, other app:// pages and remote pages', () => {
     expect(isRendererUrl(pathToFileURL(join(process.cwd(), 'out', 'renderer', 'index.html')).href, appSource)).toBe(false)
-    expect(isRendererUrl('app://mediaflow/evil.html', appSource)).toBe(false)
+    expect(isRendererUrl('app://ytdlpp/evil.html', appSource)).toBe(false)
     expect(isRendererUrl('app://other/index.html', appSource)).toBe(false)
-    expect(isRendererUrl('app://user@mediaflow/index.html', appSource)).toBe(false)
+    expect(isRendererUrl('app://user@ytdlpp/index.html', appSource)).toBe(false)
     expect(isRendererUrl('https://example.com/index.html', appSource)).toBe(false)
     expect(isRendererUrl('garbage', appSource)).toBe(false)
   })

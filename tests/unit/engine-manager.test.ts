@@ -50,7 +50,7 @@ let history: UpdateHistoryRepository
 let versions: EngineVersionsRepository
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'mediaflow-manager-'))
+  root = mkdtempSync(join(tmpdir(), 'ytdlpp-manager-'))
   managed = join(root, 'managed')
   system = join(root, 'system')
   mkdirSync(managed, { recursive: true })

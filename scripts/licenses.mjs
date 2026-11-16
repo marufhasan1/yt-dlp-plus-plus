@@ -17,7 +17,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const checkOnly = process.argv.includes('--check')
 const problems = []
 
-/** Licenses that allow distribution in a closed or open binary alongside MediaFlow (MIT). */
+/** Licenses that allow distribution in a closed or open binary alongside YT-DLP++ (MIT). */
 const APPROVED = new Set(['MIT', 'ISC', 'BSD-2-Clause', 'BSD-3-Clause', 'Apache-2.0', '0BSD', 'Python-2.0', 'BlueOak-1.0.0', 'Unlicense', 'CC0-1.0'])
 /** Weak copyleft, approved for specific packages that stay separate, replaceable modules (not bundled). */
 const APPROVED_FOR = { 'LGPL-3.0-or-later': new Set(['openpgp']) }
@@ -173,15 +173,15 @@ if (problems.length > 0) {
 if (!checkOnly) {
   const own = readFileSync(join(root, 'LICENSE'), 'utf8').trim()
   const output = [
-    `MediaFlow ${app.version} — third-party licenses`,
+    `YT-DLP++ ${app.version} — third-party licenses`,
     '',
-    'Full license texts of the software that ships with MediaFlow, as installed in the',
+    'Full license texts of the software that ships with YT-DLP++, as installed in the',
     'application archive or bundled into its code. Electron and Chromium licenses are in',
     'LICENSE.electron.txt and LICENSES.chromium.html in the installation directory.',
     'Media engines (yt-dlp, FFmpeg, Deno) are not shipped; see THIRD_PARTY_NOTICES.md.',
     '',
     '='.repeat(78),
-    `MediaFlow ${app.version} — ${app.license}`,
+    `YT-DLP++ ${app.version} — ${app.license}`,
     '='.repeat(78),
     '',
     own,

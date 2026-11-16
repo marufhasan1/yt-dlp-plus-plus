@@ -65,7 +65,7 @@ function applyTheme(settings: AppSettings): void {
 }
 
 let appliedProxy: string | null | undefined
-/** MediaFlow's own requests (thumbnails, engine downloads) use the same proxy as yt-dlp. */
+/** YT-DLP++'s own requests (thumbnails, engine downloads) use the same proxy as yt-dlp. */
 function applyNetwork(settings: AppSettings): void {
   setLogLevel(settings.logLevel)
   if (settings.proxy === appliedProxy) return
@@ -126,7 +126,7 @@ async function bootstrap(): Promise<void> {
       resourcesPath: process.resourcesPath,
       logger: scopedLogger('app-updater'),
       // Development only (ignored when packaged): a feed description for testing, e.g. against a local server.
-      devConfigPath: process.env['MEDIAFLOW_DEV_UPDATE_CONFIG'] ?? join(app.getAppPath(), 'dev-app-update.yml'),
+      devConfigPath: process.env['YTDLPP_DEV_UPDATE_CONFIG'] ?? join(app.getAppPath(), 'dev-app-update.yml'),
       portableExecutable: process.env['PORTABLE_EXECUTABLE_FILE'] ?? null
     }),
     appVersion: app.getVersion(),

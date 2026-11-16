@@ -40,7 +40,7 @@ async function launch(options: { extraPath?: string } = {}): Promise<{ app: Elec
 }
 
 test.beforeEach(() => {
-  userDataDir = mkdtempSync(join(tmpdir(), 'mediaflow-e2e-'))
+  userDataDir = mkdtempSync(join(tmpdir(), 'ytdlpp-e2e-'))
   fakePathDir = join(userDataDir, 'fake-path')
   mkdirSync(fakePathDir)
 })
@@ -54,7 +54,7 @@ test.afterEach(async () => {
 test('starts with a hardened window and the main layout', async () => {
   const { app, page, consoleErrors } = await launch()
 
-  await expect(page).toHaveTitle('MediaFlow')
+  await expect(page).toHaveTitle('YT-DLP++')
   await expect(page.getByTestId('app-version')).toContainText(/v\d+\.\d+\.\d+/)
   await expect(page.locator('html')).toHaveClass(/dark/)
 
@@ -71,7 +71,7 @@ test('starts with a hardened window and the main layout', async () => {
   // (The bridge only exists because contextBridge works, which requires contextIsolation.)
   const surface = await page.evaluate(() => {
     const scope = globalThis as Record<string, unknown>
-    const bridge = scope['mediaflow'] as Record<string, Record<string, unknown>>
+    const bridge = scope['ytdlpp'] as Record<string, Record<string, unknown>>
     return {
       bridgeKeys: Object.keys(bridge).sort(),
       appKeys: Object.keys(bridge['app'] ?? {}).sort(),
@@ -137,7 +137,7 @@ test('rejects invalid settings over IPC', async () => {
   const { app, page } = await launch()
 
   const result = await page.evaluate(() => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as {
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as {
       settings: { update(patch: unknown): Promise<unknown> }
     }
     return bridge.settings.update({ theme: 'neon', extra: true })
@@ -192,7 +192,7 @@ test('guides the user to set up missing engines', async () => {
   await dialog.getByTestId('confirm-cancel').click()
   await expect(dialog).toBeHidden()
   const install = await page.evaluate(async () => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as {
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as {
       engines: { getStatus(): Promise<{ ok: boolean; data: { install: unknown } }> }
     }
     return (await bridge.engines.getStatus()).data.install
@@ -228,7 +228,7 @@ test('reports a system engine that does not work', async () => {
 test('rejects malformed engine requests over IPC', async () => {
   const { app, page } = await launch()
   const results = await page.evaluate(async () => {
-    const invoke = (globalThis as Record<string, unknown>)['mediaflow'] as {
+    const invoke = (globalThis as Record<string, unknown>)['ytdlpp'] as {
       engines: { install(target: unknown): Promise<unknown>; refresh(deep: unknown): Promise<unknown> }
     }
     return [await invoke.engines.install('python'), await invoke.engines.refresh('yes')]
@@ -274,7 +274,7 @@ test('validates links before analysing and explains missing engines', async () =
 test('guards media and download IPC', async () => {
   const { app, page } = await launch()
   const results = await page.evaluate(async () => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as Bridge
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as Bridge
     return {
       fileUrl: await bridge.media.analyze('file:///C:/Windows/win.ini'),
       script: await bridge.media.analyze('javascript:alert(1)'),
@@ -305,7 +305,7 @@ test('persists download settings', async () => {
   await page.getByTestId('nav-settings').click()
   await page.getByTestId('concurrency').locator('select').selectOption('4')
   await expect.poll(() => page.evaluate(async () => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as Bridge
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as Bridge
     return (await bridge.settings.get()).data['maxConcurrentDownloads']
   })).toBe(4)
   await app.close()
@@ -320,7 +320,7 @@ test('guards converter IPC and explains missing FFmpeg', async () => {
   const { app, page, consoleErrors } = await launch()
   const unknown = '00000000-0000-4000-8000-000000000000'
   const results = await page.evaluate(async (token) => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as Bridge
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as Bridge
     const request = (inputs: unknown, destination: unknown = { kind: 'downloads' }) =>
       bridge.converter.start({ inputs, format: 'mp3', quality: '192', destination })
     return {

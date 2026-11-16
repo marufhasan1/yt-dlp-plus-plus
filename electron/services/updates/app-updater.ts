@@ -129,7 +129,7 @@ export function describeAppUpdateError(error: unknown): string {
     return 'Update verification failed: the downloaded file does not match the published checksum. It was discarded.'
   }
   if (/not signed by the application owner|code signature|SignatureVerification/i.test(text)) {
-    return 'Update verification failed: the downloaded installer is not signed by the MediaFlow publisher.'
+    return 'Update verification failed: the downloaded installer is not signed by the YT-DLP++ publisher.'
   }
   if (/cancel/i.test(text)) return 'The download was cancelled.'
   // GitHub answers a missing repository or release feed with 404 ("HttpError" + "404 …releases.atom").

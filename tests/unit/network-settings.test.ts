@@ -87,6 +87,11 @@ describe('advanced settings', () => {
     const plain = analyzeArgs({ ytdlp: '/y', ffmpegLocation: null, deno: null }, 'https://youtu.be/x')
     expect(plain.join(' ')).toContain('--socket-timeout 30')
     expect(plain).not.toContain('--proxy')
+    // User plugin folders are switched off where yt-dlp supports it (2024.10.22+), never passed to older copies.
+    expect(analyzeArgs({ ytdlp: '/y', ffmpegLocation: null, deno: null, ytdlpVersion: '2026.10.26' }, 'u')).toContain('--no-plugin-dirs')
+    expect(analyzeArgs({ ytdlp: '/y', ffmpegLocation: null, deno: null, ytdlpVersion: '2024.10.22' }, 'u')).toContain('--no-plugin-dirs')
+    expect(analyzeArgs({ ytdlp: '/y', ffmpegLocation: null, deno: null, ytdlpVersion: '2024.08.06' }, 'u')).not.toContain('--no-plugin-dirs')
+    expect(plain).not.toContain('--no-plugin-dirs')
   })
 })
 

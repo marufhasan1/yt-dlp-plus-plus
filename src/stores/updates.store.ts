@@ -7,7 +7,7 @@ import { bridge, unwrap } from '@/api/client'
 import { router } from '@/router'
 import { useToastStore } from './toast.store'
 
-export const UPDATE_LABELS: Record<UpdateComponentId, string> = { app: 'MediaFlow', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', deno: 'Deno' }
+export const UPDATE_LABELS: Record<UpdateComponentId, string> = { app: 'YT-DLP++', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', deno: 'Deno' }
 
 export const useUpdatesStore = defineStore('updates', () => {
   const snapshot = ref<UpdatesSnapshot | null>(null)

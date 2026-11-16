@@ -39,7 +39,7 @@ async function launch(): Promise<{ app: ElectronApplication; page: Page; console
 async function seedPlaylist(): Promise<void> {
   const first = await launch()
   await first.app.close()
-  const db = new Database(join(userDataDir, 'mediaflow.db'))
+  const db = new Database(join(userDataDir, 'ytdlpp.db'))
   const now = new Date().toISOString()
   db.prepare(
     `INSERT INTO playlists (id, source_id, playlist_url, title, uploader, total_items, created_at, updated_at)
@@ -64,7 +64,7 @@ async function seedPlaylist(): Promise<void> {
 }
 
 test.beforeEach(() => {
-  userDataDir = mkdtempSync(join(tmpdir(), 'mediaflow-e2e-pl-'))
+  userDataDir = mkdtempSync(join(tmpdir(), 'ytdlpp-e2e-pl-'))
 })
 
 test.afterEach(async () => {
@@ -104,7 +104,7 @@ test('lists a saved playlist and supports selecting its videos', async () => {
   await page.getByTestId('download-selected').click()
   await expect(page.getByTestId('toast-host')).toContainText('yt-dlp is not installed')
   const jobs = await page.evaluate(async () => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as { downloads: { list(): Promise<{ data: unknown[] }> } }
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as { downloads: { list(): Promise<{ data: unknown[] }> } }
     return (await bridge.downloads.list()).data.length
   })
   expect(jobs).toBe(0)
@@ -117,7 +117,7 @@ test('guards playlist IPC and removes playlists without touching downloads', asy
   await seedPlaylist()
   const { app, page } = await launch()
   const results = await page.evaluate(async (id) => {
-    const bridge = (globalThis as Record<string, unknown>)['mediaflow'] as {
+    const bridge = (globalThis as Record<string, unknown>)['ytdlpp'] as {
       playlists: {
         download(request: unknown): Promise<unknown>
         get(id: string): Promise<unknown>

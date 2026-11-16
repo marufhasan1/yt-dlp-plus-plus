@@ -32,7 +32,7 @@ export interface PlaylistSummary {
   /** Entries listed (may be capped; see `truncated`). */
   totalItems: number
   unavailableItems: number
-  /** True when the playlist has more entries than MediaFlow lists. */
+  /** True when the playlist has more entries than YT-DLP++ lists. */
   truncated: boolean
   createdAt: string
   updatedAt: string

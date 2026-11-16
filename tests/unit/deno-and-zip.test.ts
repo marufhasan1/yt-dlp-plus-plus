@@ -26,7 +26,7 @@ const fixture = (name: string) => readFileSync(join(__dirname, '..', 'fixtures',
 
 let dir: string
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-zip-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-zip-'))
 })
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true })

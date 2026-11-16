@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-MediaFlow includes or depends on the third-party software listed below. Each
+YT-DLP++ includes or depends on the third-party software listed below. Each
 component is distributed under its own license. The full license texts of
 everything that ships are collected in `licenses/THIRD_PARTY_LICENSES.txt` in
 the installation directory (generated at build time by `scripts/licenses.mjs`);
@@ -9,13 +9,13 @@ Electron's and Chromium's are in `LICENSE.electron.txt` and `LICENSES.chromium.h
 This file must be kept in sync with the shipped dependency tree:
 `node scripts/licenses.mjs --check` (run in CI and before every release build)
 fails when a shipped package is missing here, listed with another version, or
-uses a license that is not approved. Last checked for MediaFlow 1.0.0.
+uses a license that is not approved. Last checked for YT-DLP++ 1.0.0.
 
 ## Application runtime
 
 | Component | Version | License | Project |
 | --- | --- | --- | --- |
-| Electron | 45.2.1 | MIT | https://github.com/electron/electron |
+| Electron | 45.3.3 | MIT | https://github.com/electron/electron |
 | Chromium (bundled with Electron) | 156 | BSD-3-Clause and others — see `LICENSES.chromium.html` in the installation directory | https://www.chromium.org |
 | Node.js (bundled with Electron) | 24 | MIT and others | https://github.com/nodejs/node |
 
@@ -61,10 +61,10 @@ uses a license that is not approved. Last checked for MediaFlow 1.0.0.
 
 ## Media engines (downloaded on request, not bundled)
 
-MediaFlow does not ship these programs. When the user chooses **Install** on
+YT-DLP++ does not ship these programs. When the user chooses **Install** on
 the Software Updates page, the app downloads them directly from the provider
 listed below, verifies them, and stores them in its own engines folder
-(`<userData>/engines/<platform>-<arch>`). They run as separate programs; MediaFlow
+(`<userData>/engines/<platform>-<arch>`). They run as separate programs; YT-DLP++
 does not link against them. Their licenses apply to those copies.
 
 | Engine | Source | License of the downloaded build | Verification |

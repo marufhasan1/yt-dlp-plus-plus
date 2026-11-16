@@ -1,13 +1,17 @@
-# MediaFlow — Project Plan
+# YT-DLP++ — Project Plan
 
 Living document: architecture, decisions, milestones and progress. Update it
 whenever the implementation changes.
 
 | | |
 | --- | --- |
-| Current version | 0.1.0 |
-| Current phase | Phase 7 complete — Phase 8 (Production Release) next |
-| Last updated | 2026-11-10 |
+| Current version | 1.0.0 |
+| Current phase | Phase 8 complete — v1.0.0 ready to tag (see the Phase 8 report for what remains before publishing) |
+| Last updated | 2026-11-16 |
+
+The project was called **MediaFlow** until 2026-11-16 and is now **YT-DLP++** (display name),
+`yt-dlp-plus-plus` (package, file and Linux command name) and `ytdlpp` (internal identifiers).
+Earlier reports below use the new name, except where they quote paths or files of that time.
 
 ---
 
@@ -24,7 +28,7 @@ whenever the implementation changes.
 └──────────────────────────────────────────▲─────────────────────────────────────────────────┘
                                            │ ipcRenderer.invoke / webContents.send
 ┌──────────────────────── preload.ts (sandboxed, contextIsolation) ─────────────────────────┐
-│ Exposes window.mediaflow: a fixed, typed set of functions. No raw ipcRenderer access.     │
+│ Exposes window.ytdlpp: a fixed, typed set of functions. No raw ipcRenderer access.     │
 └──────────────────────────────────────────▲─────────────────────────────────────────────────┘
                                            │
 ┌──────────────────────────── Renderer (Vue 3, no Node.js) ─────────────────────────────────┐
@@ -61,14 +65,16 @@ whenever the implementation changes.
   scripts, styles, fonts and connections, plus `data:` images. The dev variant
   adds `ws:` and inline styles for Vite HMR.
 - All permission requests and checks are denied.
-- `window.open` is denied; HTTPS links (without credentials) open in the
-  system browser, everything else is blocked. `will-navigate`/`will-redirect`
-  away from the renderer and `<webview>` are blocked.
-- `MEDIAFLOW_USER_DATA_DIR` (test isolation) is ignored in packaged builds.
+- `window.open` is always denied (and logged); the only external pages the app opens are
+  release notes, from links the update check recorded itself (HTTPS, known hosts only). `will-navigate`/`will-redirect` away from the
+  renderer and `<webview>` are blocked.
+- Production UI served from `app://ytdlpp/` (Phase 8), not `file://`.
+- Electron fuses lock down the packaged binary (Phase 8, see below).
+- `YTDLPP_USER_DATA_DIR` (test isolation) is ignored in packaged builds.
 
 ### Storage
 
-- SQLite via better-sqlite3, file `<userData>/mediaflow.db`, WAL mode,
+- SQLite via better-sqlite3, file `<userData>/ytdlpp.db`, WAL mode,
   `foreign_keys = ON`, `busy_timeout = 5000`.
 - Migrations are TypeScript modules in `electron/database/migrations/`, each
   applied in its own transaction and recorded in `schema_migrations`. A
@@ -240,7 +246,7 @@ Code: `electron/services/media/conversion.service.ts`, `conversion-plan.ts` (pur
   - Surround is downmixed to stereo for MP3/OPUS. Embedded cover art (mjpeg/png
     `attached_pic`) is copied into MP3/M4A/FLAC; real video tracks are never copied.
 - **Run**: one conversion at a time (FFmpeg is multi-threaded). Output goes to
-  `<dest>/<name>.mediaflow-<id>.<ext>`, is re-probed and verified (audio present, expected
+  `<dest>/<name>.ytdlpp-<id>.<ext>`, is re-probed and verified (audio present, expected
   codec, ≥ 90 % of the source duration), then renamed to the first free
   `<name>.<ext>` / `<name> (n).<ext>` (never the input itself). Failure or cancel removes the
   temporary file; cancel kills the process tree. Progress = `out_time_us` / source duration,
@@ -274,9 +280,9 @@ Code: `electron/services/download/download-manager.ts`, `orphan-guard.ts`,
   `downloading`/`processing` (a crash) are recovered the same way; rows without a stored plan
   become failed (`INTERRUPTED`). The Downloads page shows a recovery notice with
   "Resume all" / "Not now". Scratch folders not owned by a paused or failed job are removed.
-- **Orphan guard.** yt-dlp is not ended by the OS when MediaFlow dies (Windows has no
+- **Orphan guard.** yt-dlp is not ended by the OS when YT-DLP++ dies (Windows has no
   parent-death signal; on Unix it leads its own process group). Each run writes
-  `.mediaflow-owner.json` (pid, executable, start time) into its scratch folder; at
+  `.ytdlpp-owner.json` (pid, executable, start time) into its scratch folder; at
   startup, before anything can resume, a still-running owner is stopped (tree kill) if
   the OS reports the same executable and, on Windows, a matching start time, so a reused
   PID is never touched. Observed: after a hard kill during extraction yt-dlp lived on for a
@@ -300,7 +306,7 @@ Code: `electron/services/download/download-manager.ts`, `orphan-guard.ts`,
   runtime, so analysis, playlist listing and downloads all use them.
 - **Proxy.** Validated and normalised in shared code (`http`, `https`, `socks4(a)`,
   `socks5(h)`; host, optional port and credentials; no path, query, whitespace or control
-  characters). yt-dlp gets `--proxy`. MediaFlow's own requests (thumbnails, engine
+  characters). yt-dlp gets `--proxy`. YT-DLP++'s own requests (thumbnails, engine
   downloads) use the same proxy through the session (`setProxy`, applied at startup and on
   change). Electron's `net.fetch` never answers a proxy's 407 challenge (verified), so when
   the proxy has credentials those requests use a small fetch built on `net.request`, which
@@ -316,7 +322,7 @@ Code: `electron/services/updates/` (`update.service.ts`, `engine-update-check.ts
 `src/pages/Updates.vue`, `src/components/updates/`, `src/components/settings/UpdateSettings.vue`,
 `scripts/dist.mjs`.
 
-- **Components**: MediaFlow, yt-dlp, FFmpeg (FFmpeg + FFprobe as one toolchain) and Deno, each
+- **Components**: YT-DLP++, yt-dlp, FFmpeg (FFmpeg + FFprobe as one toolchain) and Deno, each
   with installed version, latest version, release date, last check, state (`unknown`,
   `checking`, `up-to-date`, `available`, `waiting`, `downloading`, `installing`, `ready`,
   `updated`, `failed`, `unavailable`) and a message. Results are stored in `update_checks`
@@ -340,7 +346,7 @@ Code: `electron/services/updates/` (`update.service.ts`, `engine-update-check.ts
   install record move to `<engines>/.rollback/<target>/` (one generation). **Rollback** checks
   the kept files (size, SHA-256 against the record, run) and swaps them back; the version it
   replaces becomes the new rollback copy, so a rollback can be undone. Rollbacks are offered
-  only for copies MediaFlow manages. System copies are never replaced: "Install MediaFlow's
+  only for copies YT-DLP++ manages. System copies are never replaced: "Install YT-DLP++'s
   copy" installs a managed one, which takes precedence.
 - **Deferral**: engines leased by downloads/conversions are never replaced. An update
   requested while they are in use waits (`waiting`, cancellable) and runs as soon as the
@@ -358,16 +364,47 @@ Code: `electron/services/updates/` (`update.service.ts`, `engine-update-check.ts
   by the normal shutdown and offered for resuming). The outcome is recorded at the next start
   by comparing the running version with the one installed. Builds without an update feed,
   the portable Windows build and development runs report why updates are unavailable.
-  Development runs can be pointed at a test feed with `MEDIAFLOW_DEV_UPDATE_CONFIG` /
+  Development runs can be pointed at a test feed with `YTDLPP_DEV_UPDATE_CONFIG` /
   `dev-app-update.yml` (ignored when packaged).
 - **Update feed at build time**: `scripts/dist.mjs` adds `publish: github` with
-  `MEDIAFLOW_GITHUB_OWNER` / `MEDIAFLOW_GITHUB_REPO` (validated) and `--publish never`;
+  `YTDLPP_GITHUB_OWNER` / `YTDLPP_GITHUB_REPO` (validated) and `--publish never`;
   electron-builder then writes `app-update.yml` into the package and `latest.yml` +
   `.blockmap` next to the installer. On Windows the feed file is only written for NSIS
   targets (not `--dir`), as electron-builder's PublishManager shows.
 - **IPC**: `updates:get-status|check|update-engine|cancel-waiting|rollback|download-app|cancel-app-download|install-app|history|open-release-notes`,
   events `updates:changed|notice`. Release notes open in the browser only for the URL the
   main process recorded, over HTTPS, on github.com or ffmpeg.martin-riedl.de.
+
+### Production release (Phase 8)
+
+- **`app://` scheme** (`electron/app-protocol.ts`): registered as standard, secure, fetch-capable
+  before `ready` and served with `protocol.handle` from `out/renderer`. Requests must use the
+  host `ytdlpp`; the decoded path must stay inside the renderer folder (null bytes refused)
+  and have an allowed extension; responses carry the right content type and `nosniff`.
+  `isRendererUrl` accepts only `app://ytdlpp/index.html` (or the dev server in development).
+- **Fuses** (`electronFuses` in `electron-builder.yml`): `RunAsNode`, `NODE_OPTIONS` and
+  `--inspect` off; cookie encryption, embedded asar integrity and `OnlyLoadAppFromAsar` on;
+  `GrantFileProtocolExtraPrivileges` off; the ad-hoc macOS signature is re-applied.
+- **Package contents**: source maps, build metadata, SQLite sources and unused OpenPGP builds
+  are excluded; only the target's `better-sqlite3` prebuild (`<platform>-<arch>.node`) is
+  shipped, via a root extglob pattern. OpenPGP.js is unpacked from the asar (LGPL
+  replaceability). The asar is ~8 MB.
+- **License pipeline**: an electron-vite plugin records the npm packages in each bundle
+  (`out/bundled-packages.*.json`); `scripts/licenses.mjs` combines them with production
+  dependencies, checks THIRD_PARTY_NOTICES.md (listed, correct version, approved license —
+  LGPL only for openpgp) and writes the full texts to `resources/licenses/`. Packaged apps
+  contain `LICENSE.txt`, `THIRD_PARTY_NOTICES.md` and `licenses/THIRD_PARTY_LICENSES.txt`.
+- **Package verification** (`scripts/verify-package.cjs`): reads the fuse wire, lists the
+  asar, checks required files, exactly one native prebuild for the target, unpacked OpenPGP,
+  license files and the Linux icon, and prints the update feed. Run by CI and Release.
+- **Icon**: original SVG (`resources/icons/icon.svg`), rendered by Electron itself into the
+  PNG and a multi-size ICO (`scripts/render-icon.cjs`).
+- **Workflows**: `ci.yml` (push to main, pull requests; Windows, macOS, Linux: type-check →
+  lint → tests → build → license check → Playwright → unpacked package + verify) and
+  `release.yml` (tags `vX.Y.Z`: verify tag/version/changelog, tests, `npm audit` for
+  production → per-OS build, optional signing/notarization from secrets, verify → draft
+  release with installers, `latest*.yml`, blockmaps and `SHA256SUMS.txt`, notes from
+  CHANGELOG.md). Actions are pinned to commit SHAs; checkouts do not keep credentials.
 
 ### Directory separation
 
@@ -378,7 +415,7 @@ Code: `electron/services/updates/` (`update.service.ts`, `engine-update-check.ts
 | Managed engines | `<userData>/engines` |
 | Engine rollback copies | `<userData>/engines/<platform>-<arch>/.rollback/<target>/` (one previous version per engine, with its install record) |
 | Partial downloads | `<userData>/downloads-tmp/<jobId>`: kept while a job is paused or failed (for resuming), removed when it completes, is cancelled or removed |
-| Conversion in progress | `<dest>/<name>.mediaflow-<id>.<ext>`, renamed when verified (same volume, so the rename is atomic) |
+| Conversion in progress | `<dest>/<name>.ytdlpp-<id>.<ext>`, renamed when verified (same volume, so the rename is atomic) |
 | Logs | `app.getPath('logs')` (`<userData>/logs`; `~/Library/Logs/<name>` on macOS) |
 | Download destination | OS Downloads folder by default; changeable in Settings → Downloads |
 
@@ -400,13 +437,13 @@ to the user as toasts; details stay in the log.
 | **better-sqlite3 13 with `npmRebuild: false`** | v13 is an N-API module with prebuilt binaries for win32/darwin/linux × x64/arm64, selected at runtime. No compilation against Electron headers is needed; this also allows cross-arch packaging. Verified in a packaged Windows build. |
 | **@lucide/vue** instead of `lucide-vue-next` | `lucide-vue-next` is deprecated in favour of `@lucide/vue`. |
 | **Settings defaults separate from field schemas** | Zod 4 applies `.default()` inside `.partial()`, so a one-key patch would silently reset every other setting. |
-| **Hash router** | The production renderer is loaded via `file://`; there is no server to rewrite history paths. |
+| **Hash router** | The production renderer is served from static files (now `app://`); there is no server to rewrite history paths. |
 | **IpcResult envelopes** | Preserve error codes across the IPC boundary; avoid leaking raw messages. |
 | **Preload bundles shared code** (`externalizeDeps: false`) | Sandboxed preloads can only `require('electron')`. |
 | **Product name from `package.json` `productName`** | Single source used by Electron (`app.getName()`, userData folder) and Electron Builder. |
 | **Native window frame** | Consistent, accessible window controls on all three platforms without custom title-bar code. |
 | **System font stack** | No network fonts (CSP, offline use); renders natively per platform. |
-| **License: MIT (provisional)** | Set in `package.json`; confirm before the first public release. |
+| **License: MIT** | `LICENSE` added in Phase 8 and shipped as `LICENSE.txt`. |
 | **Engines downloaded on request, not bundled** | Keeps installers small and avoids redistributing GPL executables (yt-dlp standalone builds are GPLv3+). The `bundled` resolution path exists if Phase 8 decides otherwise. |
 | **yt-dlp signature pinned to one key** | Upgrades trust from "GitHub over HTTPS" to "yt-dlp maintainers' signing key". If yt-dlp rotates its key, installs fail closed until the app ships the new key. |
 | **BtbN LGPL release-branch builds** for Windows/Linux | yt-dlp's own FFmpeg fork now publishes only GPL master builds. BtbN's LGPL builds contain every encoder needed (verified on the real binary) and are LGPL-3.0-or-later (confirmed with `ffmpeg -L`). |
@@ -415,7 +452,7 @@ to the user as toasts; details stay in the log.
 | **openpgp kept external** | LGPL-3.0-or-later; loaded from `node_modules` (not bundled into main) so it stays a separately replaceable library. |
 | **Install records in `manifest.json`** next to the binaries, versions/history in SQLite | The manifest travels with the files it describes (deleting the folder deletes both); SQLite holds the spec's `engine_versions` and `update_history`. |
 | **Deno as a managed, optional engine** (user decision, Phase 3) | yt-dlp now needs a JavaScript runtime for full YouTube support: without one it warns the mode is deprecated and returned 53 instead of 61 formats on a test video. Deno is yt-dlp's documented default and runs sandboxed. Using Electron's own Node instead would require keeping the `RunAsNode` fuse enabled. Missing Deno shows a notice, not a block. |
-| **In-process zip extraction (yauzl)** | Deno ships only `.zip`, which Linux's GNU tar cannot read. yauzl rejects traversal paths; MediaFlow adds a containment check and size limits. `.tar.xz` still uses the OS tar. |
+| **In-process zip extraction (yauzl)** | Deno ships only `.zip`, which Linux's GNU tar cannot read. yauzl rejects traversal paths; YT-DLP++ adds a containment check and size limits. `.tar.xz` still uses the OS tar. |
 | **Analyses cached in main, referenced by id** | The renderer never handles format ids or selectors, and the 175 KB+ info JSON never crosses IPC. |
 | **Thumbnails proxied through main** | Keeps the renderer CSP at `img-src 'self' data:`, avoids leaking the user's IP/referrer from the UI, and blocks private-network URLs from untrusted metadata. |
 | **Exact format ids + fallback selector** | Downloads what the user saw, with yt-dlp's own choice as a safety net if a format disappears between analysis and download. |
@@ -423,7 +460,7 @@ to the user as toasts; details stay in the log.
 | **Playlist entries use a format *profile*, not per-video analysis** | Analysing every entry (≈10 s each) before a 100-video download would take a quarter of an hour. Instead yt-dlp picks per video from container-safe filters and a sort order. The order was verified on real data: resolution and fps first (otherwise a muxed 360p stream wins), then codec (yt-dlp would pick AV1 for MP4), then `channels:2` (yt-dlp would pick 5.1 surround). Picks match the single-video planner. |
 | **One job per video** | Gives each entry its own status, retry and cancel, and reuses the queue, concurrency and persistence built in Phase 3. |
 | **Entry thumbnails fetched on demand, by position** | A 1000-entry list would otherwise mean 1000 image downloads up front. Rows request their image when they near the viewport; the renderer names an entry, never a URL. |
-| **WebP thumbnails passed through** | YouTube serves signed `.jpg` thumbnail URLs as WebP, which Electron's encoder cannot read. Genuine small WebP data (signature-checked) is passed to the renderer as a data URL. |
+| **Thumbnails passed through, never decoded in main** (Phase 8) | YouTube serves `.jpg` URLs as WebP, which Electron's encoder cannot read; and decoding untrusted images in the privileged process is avoidable risk. JPEG, PNG and WebP up to 512 KB, recognised by signature, go to the sandboxed renderer as data URLs. |
 | **Operations wait for engine detection** | A link pasted right after launch waits (bounded) for the first engine check instead of failing with "still being checked". |
 | **Converter files and folders referenced by tokens** | Only the native dialogs choose paths; the renderer cannot ask FFmpeg to read or write anything else. |
 | **`file:` URLs for FFmpeg inputs/outputs** | A local name such as `concat:a|b` or `http:x` would otherwise be opened as a protocol. Verified with Unicode paths on Windows. |
@@ -443,9 +480,16 @@ to the user as toasts; details stay in the log.
 | **One kept version per engine, swap-based rollback** | Covers "the new yt-dlp broke a site" without unbounded disk use (FFmpeg is ~260 MB); swapping keeps rollback reversible. |
 | **Update checks never download binaries** | Checking is cheap and safe to automate; downloads happen only on an explicit update (or opt-in yt-dlp auto-update). |
 | **Deferred, not refused, while engines are in use** | Spec: "defer the update or ask the user to finish them". Replacing a running executable is impossible on Windows and unsafe elsewhere. |
-| **yt-dlp's own updater (`-U`) is not used** | It cannot be relied on for every packaging type and would bypass MediaFlow's signature check, rollback and history. |
+| **yt-dlp's own updater (`-U`) is not used** | It cannot be relied on for every packaging type and would bypass YT-DLP++'s signature check, rollback and history. |
 | **App update feed configured at build time, opt-in per build** | The repository is not known to the code; builds made without it say so instead of checking a wrong feed. |
 | **App update outcome recorded after the restart** | Only the next start can tell whether the installer really replaced the app. |
+| **`app://` scheme instead of `file://`** (Phase 8) | Lets the `GrantFileProtocolExtraPrivileges` fuse be turned off and confines what the UI origin can load to the renderer folder. |
+| **Fuses set by electron-builder** | One declarative place; `verify-package.cjs` reads the wire back from each built binary. |
+| **Exclusions by root extglob, no per-platform `files`** | A platform `files` list made only of exclusions makes electron-builder include the whole project (1.4 GB archive); a root exclusion overrides any platform re-inclusion. |
+| **Renamed to YT-DLP++, with `yt-dlp-plus-plus` for files and `ytdlpp` internally** (user decision, after Phase 8) | `+` is unsafe in update download URLs and is not allowed in Debian package names; the Linux command must not clash with the distributions' own `yt-dlp` package. The README states that the project is independent of yt-dlp and FFmpeg and credits them. |
+| **Release as draft** | A human reviews artifacts and notes before users' updaters see them. |
+| **Universal Windows installer** | electron-builder combines x64 and arm64 NSIS into one installer (~241 MB) that the updater also uses; a per-arch feed would need separate configurations. |
+| **License check in CI from the built bundles** | Notices drift silently when dependencies change; checking what is actually bundled catches it. |
 | **Channel links → Videos tab, 1000-entry cap** | The bare channel page lists tabs as nested playlists and took 30 s to expand; the Videos tab lists 300 videos in 8 s. The cap bounds memory and time; the UI says when a list was truncated. |
 
 ---
@@ -566,14 +610,22 @@ deferral and two rollbacks through the UI against the real providers; app update
 downloaded and verified against an update feed, and the packaged build's GitHub feed wiring
 confirmed).
 
-### 🔜 Phase 8 — Production Release
+### ✅ Phase 8 — Production Release
 
-Application icons, per-platform pruning of native prebuilds, signing and
-notarization, GitHub Actions (lint → test → build → package → publish),
-checksums, security audit, documentation, license notices. Lock down Electron fuses
-(`RunAsNode`, `EnableNodeOptionsEnvironmentVariable`, `EnableNodeCliInspectArguments` off;
-`OnlyLoadAppFromAsar` and embedded asar integrity on) — Phase 2 confirmed the packaged
-exe currently honours `ELECTRON_RUN_AS_NODE`.
+- [x] Application icon (original artwork), Windows ICO, Linux window icon
+- [x] Packaging: per-target native prebuild only, no source maps or build sources; Windows NSIS (x64 + ARM64) and portable built and verified locally; macOS and Linux configured
+- [x] Electron fuses locked down and verified in the packaged binary
+- [x] `app://` scheme replaces `file://` for the UI
+- [x] Security audit (independent review) and fixes; residual risks documented in SECURITY.md
+- [x] Automated tests extended (protocol, containment, thumbnails, FFmpeg protocols, yt-dlp plugins)
+- [x] License notices: LICENSE, generated full license texts, coverage/version/approval check
+- [x] Documentation: README (installing, verifying, releasing), CHANGELOG, SECURITY
+- [x] GitHub Actions: CI on three OSes and a tag-driven release with checksums and update manifests
+- [x] Release preparation: version 1.0.0, changelog section, signing/notarization wiring via secrets
+- [ ] Not done here: running the workflows on GitHub (no repository), macOS/Linux packages, code-signing certificates
+
+Deliverable: publicly distributable v1.0 — **met for Windows locally; macOS and Linux
+packages depend on the first CI/Release run** (see the Phase 8 report).
 
 ---
 
@@ -584,7 +636,7 @@ exe currently honours `ELECTRON_RUN_AS_NODE`.
 - Electron main process with single-instance lock, graceful shutdown (IPC
   handlers removed, database closed on quit) and a fatal-startup dialog that
   points to the log file.
-- Secure preload bridge `window.mediaflow` with `app.getInfo`,
+- Secure preload bridge `window.ytdlpp` with `app.getInfo`,
   `app.openLogsFolder`, `settings.get`, `settings.update`, `settings.onChanged`.
 - SQLite database with migration runner and the full initial schema.
 - Settings service: in-memory cache, per-key validation, change events
@@ -878,7 +930,7 @@ exe currently honours `ELECTRON_RUN_AS_NODE`.
   new `DUPLICATE` error code; Zod schemas for history queries and deletion.
 - Settings: `maxRetries`, `networkTimeoutSeconds`, `proxy`, `speedLimitKib`, `logLevel`;
   proxy validation (`shared/validation/network.ts`); yt-dlp `--socket-timeout`, `--proxy`,
-  `--limit-rate`; session proxy for MediaFlow's own requests; proxy-authenticating fetch.
+  `--limit-rate`; session proxy for YT-DLP++'s own requests; proxy-authenticating fetch.
 - UI: Downloads (Pause/Resume, Paused filter, Pause all/Resume all, recovery notice, retry
   countdown), History page, Settings → Advanced, Home "downloaded before" notice, playlist
   "Skip videos already downloaded" option and Paused status.
@@ -898,7 +950,7 @@ exe currently honours `ELECTRON_RUN_AS_NODE`.
 | — classifier: real network-drop output (`ERROR: ` then `[download] Got error: …`) → `NETWORK` | pass |
 | Electron app tests (Playwright), 20 | **20/20 pass** (16 before; the old "interrupted → failed" test replaced; 5 new): recovery notice, paused/interrupted rows, orphan scratch folder removed, partial files kept, resume/cancel; Resume all; History paging, search, filters (format, result, custom dates, today), file missing, delete with/without file (trash stubbed), retry from history; IPC guards; Advanced settings persisted, proxy validation and redaction, proxy applied to the session on change and at startup |
 | **Manual real-world run A** (Windows 11, isolated profile, Big Buck Bunny CC-BY, 1080p60 MP4) | Speed limit: 2.96 MB/s at a 3 MB/s limit. Pause at 16.6 MB: no engine process left, `.part` kept; resume continued at 16.6 MB (never lower). Quit at 23.4 MB: no process left, partial kept; restart showed "1 download was interrupted…", Resume all continued at 23.4 MB. Hard kill of Electron's main process while downloading: yt-dlp exited within 1 s; restart recovered the job as paused/interrupted from its partial file. Completed file: H.264 1920×1080 + AAC stereo, 634.6 s; **full FFmpeg decode without errors**; scratch folder emptied. Re-analysing showed "You have downloaded this video before … Show". 0 console errors. |
-| **Manual real-world run B** (local proxy requiring Basic authentication) | Proxy entered on Settings → Advanced (shown as `http://***@127.0.0.1:…`). yt-dlp's analysis and downloads went through it (www.youtube.com, googlevideo); MediaFlow's thumbnail request got a 407 and was answered by the proxy-authenticating fetch. M4A download completed. Tunnels cut at 10.0 MB of a 1080p download: "Connection problem — retrying in 5 s (attempt 1 of 3)", resumed at 10.3 MB, completed (257 MB, verified with FFprobe). History listed both. The password never appeared in the log. |
+| **Manual real-world run B** (local proxy requiring Basic authentication) | Proxy entered on Settings → Advanced (shown as `http://***@127.0.0.1:…`). yt-dlp's analysis and downloads went through it (www.youtube.com, googlevideo); YT-DLP++'s thumbnail request got a 407 and was answered by the proxy-authenticating fetch. M4A download completed. Tunnels cut at 10.0 MB of a 1080p download: "Connection problem — retrying in 5 s (attempt 1 of 3)", resumed at 10.3 MB, completed (257 MB, verified with FFprobe). History listed both. The password never appeared in the log. |
 | Packaged build | not rebuilt this phase: no new dependencies |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 
@@ -979,12 +1031,12 @@ exe currently honours `ELECTRON_RUN_AS_NODE`.
 
 ### Incident: a packaged test run used the real user profile
 
-The packaged build was launched for the feed check with the usual `MEDIAFLOW_USER_DATA_DIR`,
+The packaged build was launched for the feed check with the usual `YTDLPP_USER_DATA_DIR`,
 which packaged builds deliberately ignore. It therefore opened the user's own
 `%APPDATA%\MediaFlow` profile and applied migrations 5 and 6 to its database (schema 4 → 6),
-appended to its log and created `.updaterId`. The older installed MediaFlow build would now
+appended to its log and created `.updaterId`. The older installed YT-DLP++ build would now
 refuse to start ("schema version 6 is newer than this application supports"). No user data
-was lost: the changes are only in `mediaflow.db-wal`/`-shm` (the main file is untouched since
+was lost: the changes are only in `ytdlpp.db-wal`/`-shm` (the main file is untouched since
 2026-11-03; verified on copies that it is schema 4 without the WAL), and backups of every
 touched file are in the session scratchpad. Removing the WAL/SHM, `.updaterId` and the
 appended log lines restores the profile; that step awaits the user's approval. Packaged
@@ -1001,3 +1053,120 @@ builds are no longer launched for testing (recorded for future sessions).
 4. One rollback generation per engine; keeping FFmpeg's previous version uses ~260 MB.
 5. Automatic checks run while the app is open; there is no background service.
 6. App update notifications are in-app notices, not OS notifications.
+
+---
+
+## 11. Phase 8 report
+
+### Implemented
+
+- **Icon**: original artwork (`resources/icons/icon.svg`); `scripts/render-icon.cjs` renders it
+  with Electron into `resources/build/icon.png` (1024 px) and a 16–256 px `icon.ico`. Linux
+  windows get `icon.png` from the resources folder.
+- **Packaging** (`electron-builder.yml`): only the target's `better-sqlite3` prebuild, no
+  SQLite sources, source maps, build metadata or unused OpenPGP builds; OpenPGP.js unpacked
+  (LGPL); `LICENSE.txt`, notices and full license texts in the resources; NSIS installer name
+  without architecture (one installer for x64 and ARM64); macOS hardened runtime, entitlements
+  and notarization through environment variables; Linux synopsis/category/maintainer.
+- **Fuses**: see Architecture → Production release. Verified on the built binaries.
+- **`app://ytdlpp/`** custom scheme with containment checks replaces `file://`.
+- **Security fixes** from the audit (below).
+- **Licenses**: `LICENSE` (MIT); `scripts/licenses.mjs` (generate and `--check`); notices
+  table names the exact bundled packages and versions; `scripts/dist.mjs` generates the texts
+  before every package build.
+- **Package verification**: `scripts/verify-package.cjs` (single app or `--all`).
+- **GitHub Actions**: `.github/workflows/ci.yml` and `.github/workflows/release.yml`.
+- **Release preparation**: version 1.0.0 (`package.json` and lockfile), Electron 45.3.3
+  (latest 45.x patch), `CHANGELOG.md` with the 1.0.0 section, `SECURITY.md`, README sections
+  on installing, verifying downloads, unsigned builds, CI and publishing, new npm scripts
+  (`licenses`, `licenses:check`, `verify:package`, `icons`).
+
+### Security audit
+
+An independent review covered the main process, IPC, preload, engine handling, packaging and
+updates.
+
+| Finding | Severity | Status |
+| --- | --- | --- |
+| Packaged binary honoured `ELECTRON_RUN_AS_NODE`, `NODE_OPTIONS`, `--inspect`; no asar integrity | Medium | **Fixed** (fuses); checked on the packaged app: the variables and `--inspect` had no effect |
+| yt-dlp's reported output file trusted for "Show in folder" and history, even outside the destination (and from stderr) | Low | **Fixed**: only stdout `[MF-FILE]` lines; paths outside the destination (after `realpath`) are ignored and logged |
+| Windows builds unsigned → updates verified by SHA-512 only, SmartScreen warnings | Medium | **Documented**; signing wired through Actions secrets (electron-builder sets `publisherName` when signing) |
+| UI loaded from `file://` | Info | **Fixed**: `app://` scheme, `GrantFileProtocolExtraPrivileges` off |
+| `window.open` handed any HTTPS link to the system browser | Low | **Fixed**: always denied |
+| Clipboard text returned to the renderer whatever it contained (with L2, an exfiltration path) | Low | **Fixed**: returned only when it is a valid media link |
+| Converter restricted FFmpeg protocols only partly | Low | **Fixed**: `-protocol_whitelist file` on probe and conversion inputs (FFmpeg 8 already limits nested protocols; defence in depth) |
+| Thumbnail private-address filter checked only the URL's host; redirects were followed | Low | **Partly fixed**: redirects refused (`redirect: 'error'`). Names that resolve to private addresses are not checked; HTTPS is required, so a private service would also need a valid certificate for that name. Documented |
+| Thumbnails decoded by `nativeImage` in the unsandboxed main process | Low | **Fixed**: signature-checked pass-through to the sandboxed renderer |
+| yt-dlp loads plugins from user directories | Low | **Fixed**: `--no-plugin-dirs` (yt-dlp ≥ 2024.10.22) |
+| CI/Release workflow hardening (pinned actions, no persisted credentials, least permissions) | Info | **Done** |
+| FFmpeg/Deno checksums come from the same source as the binaries | Info | **Documented** (SECURITY.md) |
+| Proxy credentials in plain text in the database and on yt-dlp's command line | Info | **Documented** (SECURITY.md) |
+
+`npm audit --omit=dev`: 0 vulnerabilities. Full `npm audit`: 14 moderate, all a `minimatch`
+ReDoS inside ESLint and electron-builder (build-time only, not shipped; the only offered fix is
+a breaking `--force` downgrade).
+
+### Tests performed
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint` | Pass, 0 problems |
+| Unit + integration tests (Vitest), 27 files | **427/427 pass** (413 before + 14 new): `app://` resolution (host, traversal, encoded separators, null bytes, extensions), renderer URL checks for `app://`, output containment, thumbnail pass-through and redirect refusal, FFmpeg protocol whitelist, `--no-plugin-dirs` version gating |
+| Electron app tests (Playwright) | **26/26 pass** on the production build served from `app://`, in consecutive runs |
+| `npm run licenses:check` | 32 packages checked (9 bundled into the UI), all listed with matching versions and approved licenses |
+| Windows packaging (x64 NSIS + ARM64 NSIS → one universal installer, x64 portable) | `MediaFlow-Setup-1.0.0.exe` (241 MB), `.blockmap`, `latest.yml`, `MediaFlow-Portable-1.0.0-x64.exe` (112 MB) produced with a test feed (before the rename) |
+| `verify-package.cjs --all` on `win-unpacked` and `win-arm64-unpacked` | Pass: fuses as configured, exactly one `win32-x64` / `win32-arm64` SQLite prebuild, OpenPGP unpacked, no maps or sources, license files present |
+| Packaged runtime check (isolated "MediaFlow QA" build, own profile; product name read from the asar before launch) | Starts and loads the UI from `app://` (screenshot), 6 migrations applied in its own profile, no errors; `ELECTRON_RUN_AS_NODE=1` and `NODE_OPTIONS` ignored, `--inspect` opened no port. The user's real profile was checked before and after: unchanged. The QA profile was deleted. |
+| Real smoke run (development build, isolated profile) | yt-dlp 2026.10.26 with `--no-plugin-dirs` analysed a CC-BY video; thumbnail passed through (JPEG, 42 KB); M4A download (10.7 MB) completed inside the chosen folder |
+| Workflows | Reviewed by hand (syntax, secrets only in `env`, pinned SHAs). A local `actionlint` run was not possible in this session. **Not yet run on GitHub.** |
+
+### Bugs found and fixed during the phase
+
+- Excluding all prebuilds at the root and re-including one per platform shipped **no** SQLite
+  binary (the app would not start); a platform `files` list of only exclusions then shipped the
+  whole project (1.4 GB). Caught by `verify-package.cjs`; fixed with one root extglob.
+- WHATWG URL parsing already normalises `..` in `app://` URLs; tests corrected to assert
+  containment of the result rather than rejection.
+- The updater e2e feed offered 0.2.0, which is older than 1.0.0; it now offers the next major
+  version.
+- A download-manager test raced the release of the engine lease (intermittent); now waits.
+- ESLint scanned generated QA files and flagged `require` in the CommonJS build scripts;
+  configuration adjusted.
+
+### Final acceptance criteria
+
+| Criterion | Status |
+| --- | --- |
+| Runs on Windows, macOS and Linux | Windows: verified (development, production build, packaged). macOS, Linux: code is platform-aware and CI runs the app tests on both, but **not yet run** |
+| Analyse and download individual videos | ✅ (real downloads, Phases 3 and 8) |
+| Complete or selected playlist items | ✅ (Phase 4) |
+| MP4, WebM, MKV where supported | ✅ |
+| MP3, M4A, WAV, FLAC, OPUS | ✅ |
+| Available video resolutions | ✅ (discovered per video) |
+| Audio quality | ✅ |
+| Convert local media files | ✅ (Phase 5) |
+| Manage download queues | ✅ (Phase 6) |
+| Download history | ✅ (Phase 6) |
+| yt-dlp checked and updated independently | ✅ (Phase 7) |
+| FFmpeg and FFprobe managed | ✅ (Phases 2 and 7) |
+| Application updates independently | ✅ against a test feed; against a real GitHub release once one is published |
+| Safe recovery from interrupted downloads | ✅ (Phase 6) |
+| No separate Python or yt-dlp installation | ✅ (managed engines) |
+| Proper license notices | ✅ (checked automatically) |
+| Passes its automated tests | ✅ locally on Windows; on macOS/Linux once CI runs |
+| Installers and release artifacts for all platforms | Windows ✅ locally; macOS and Linux **configured, produced by the Release workflow — not yet run** |
+
+### Known issues and follow-ups
+
+1. **Before tagging v1.0.0**: push to a GitHub repository, let CI pass on all three systems,
+   and (recommended) add signing secrets. The first Release run is the first macOS and Linux
+   packaging; review its draft before publishing.
+2. Builds are unsigned until certificates are configured: SmartScreen/Gatekeeper warnings,
+   and macOS cannot install updates in place.
+3. The Windows installer contains both architectures (241 MB download for every user).
+4. Residual risks in SECURITY.md (shared-source checksums for FFmpeg/Deno, proxy credentials
+   in plain text, thumbnail host names not resolved before the private-address check,
+   dev-only `minimatch` advisory).
+5. The Phase 7 real-profile incident still awaits the user's approval to restore the profile.
+6. From earlier phases: portable Windows build does not update itself; one rollback
+   generation per engine; checks run only while the app is open; notices are in-app only.

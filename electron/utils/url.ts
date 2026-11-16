@@ -1,11 +1,11 @@
 /**
  * Where the renderer is loaded from: the Vite dev server, or the bundled UI
- * served from `root` on app://mediaflow/ (see app-protocol.ts).
+ * served from `root` on app://ytdlpp/ (see app-protocol.ts).
  */
 export type RendererSource = { kind: 'dev-server'; url: string } | { kind: 'app'; root: string }
 
 /** The UI's address on the app:// scheme (kept in sync with app-protocol.ts). */
-const APP_ORIGIN = 'app://mediaflow'
+const APP_ORIGIN = 'app://ytdlpp'
 const APP_ENTRY_PATH = '/index.html'
 
 /**

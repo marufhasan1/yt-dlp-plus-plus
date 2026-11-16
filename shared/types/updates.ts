@@ -41,7 +41,7 @@ export interface ComponentUpdate {
   channel: YtDlpChannel | null
   /** yt-dlp: installing the latest version means switching channels (possibly to an older version). */
   channelSwitch: boolean
-  /** The installed copy belongs to the system (PATH), so MediaFlow installs its own copy instead of replacing it. */
+  /** The installed copy belongs to the system (PATH), so YT-DLP++ installs its own copy instead of replacing it. */
   systemCopy: boolean
   /** A previous version kept for rolling back, if any. */
   rollbackVersion: string | null

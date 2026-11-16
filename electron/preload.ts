@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { BRIDGE_KEY } from '@shared/constants/app'
 import { IPC_EVENTS, IPC_INVOKE } from '@shared/constants/ipc-channels'
-import type { IpcEventContract, IpcInvokeContract, IpcResult, MediaFlowApi, Unsubscribe } from '@shared/types/ipc'
+import type { IpcEventContract, IpcInvokeContract, IpcResult, YtDlppApi, Unsubscribe } from '@shared/types/ipc'
 
 /*
  * The renderer never sees ipcRenderer. It gets a fixed set of functions, each
@@ -31,7 +31,7 @@ function subscribe<E extends keyof IpcEventContract>(
   }
 }
 
-const api: MediaFlowApi = {
+const api: YtDlppApi = {
   app: {
     getInfo: () => invoke(IPC_INVOKE.appGetInfo),
     openLogsFolder: () => invoke(IPC_INVOKE.appOpenLogsFolder),

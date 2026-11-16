@@ -7,7 +7,7 @@ import { formatDateTime } from '@/utils/format'
 const store = useUpdatesStore()
 onMounted(() => void store.loadHistory().catch(() => {}))
 
-const NAMES: Record<UpdateHistoryEntry['component'], string> = { app: 'MediaFlow', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', ffprobe: 'FFprobe', deno: 'Deno' }
+const NAMES: Record<UpdateHistoryEntry['component'], string> = { app: 'YT-DLP++', 'yt-dlp': 'yt-dlp', ffmpeg: 'FFmpeg', ffprobe: 'FFprobe', deno: 'Deno' }
 const OUTCOMES: Record<UpdateHistoryEntry['status'], { label: string; classes: string }> = {
   success: { label: 'Installed', classes: 'text-success' },
   failed: { label: 'Failed', classes: 'text-danger' },

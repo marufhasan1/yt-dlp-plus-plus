@@ -72,7 +72,7 @@ async function saveProxy(value: string | null): Promise<void> {
   try {
     await settingsStore.update({ proxy: parsed.data })
     proxyDraft.value = ''
-    toasts.success(parsed.data ? 'Proxy saved' : 'Proxy removed', parsed.data ? 'New connections use it.' : 'MediaFlow connects directly again.')
+    toasts.success(parsed.data ? 'Proxy saved' : 'Proxy removed', parsed.data ? 'New connections use it.' : 'YT-DLP++ connects directly again.')
   } catch (error) {
     proxyError.value = errorMessage(error)
   } finally {
@@ -98,8 +98,8 @@ async function saveProxy(value: string | null): Promise<void> {
         <div class="min-w-0">
           <p class="text-[13.5px] font-medium">Proxy</p>
           <p class="mt-0.5 text-[13px] text-fg-muted">
-            Used by yt-dlp and by MediaFlow's own requests (thumbnails, engine downloads). Supports http, https, socks4(a) and
-            socks5(h). A user name and password, if included, are stored unencrypted in MediaFlow's settings on this computer.
+            Used by yt-dlp and by YT-DLP++'s own requests (thumbnails, engine downloads). Supports http, https, socks4(a) and
+            socks5(h). A user name and password, if included, are stored unencrypted in YT-DLP++'s settings on this computer.
           </p>
           <p class="mt-1.5 text-[12.5px]" data-testid="proxy-current">
             <span class="text-fg-muted">Current:</span>

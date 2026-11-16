@@ -5,7 +5,7 @@ import type { FetchFn } from './trusted-http'
  * Electron's net.fetch goes through the session proxy but never answers a
  * proxy's authentication challenge (no `login` event reaches the app; verified:
  * it returns HTTP 407). net.request does emit `login`. So when the configured
- * proxy has credentials, MediaFlow's own requests (thumbnails, engine
+ * proxy has credentials, YT-DLP++'s own requests (thumbnails, engine
  * downloads) use this small fetch built on net.request instead.
  */
 

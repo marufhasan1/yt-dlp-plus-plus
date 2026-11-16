@@ -16,7 +16,7 @@ const node = process.execPath
 let dir: string
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-proc-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-proc-'))
 })
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true })

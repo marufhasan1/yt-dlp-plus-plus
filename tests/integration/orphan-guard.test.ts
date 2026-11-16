@@ -16,7 +16,7 @@ import { silentLogger } from '../../electron/utils/logger'
 
 let dir: string
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-orphan-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-orphan-'))
 })
 afterEach(() => rmSync(dir, { recursive: true, force: true }))
 
