@@ -20,6 +20,8 @@ YT-DLP++ is intended for downloading content you own or are otherwise
 authorized to download. Respect copyright and the terms of the platforms you
 use.
 
+
+
 ## Installing
 
 Download the file for your system from the project's GitHub Releases page:
