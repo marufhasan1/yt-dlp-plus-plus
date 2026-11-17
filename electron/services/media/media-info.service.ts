@@ -20,7 +20,7 @@ import { selectThumbnailUrl, type ThumbnailService } from './thumbnail.service'
 import { YTDLP_ENV, analyzeArgs, type EngineRuntime } from './ytdlp-command'
 import { classifyYtDlpError } from './ytdlp-errors'
 
-/** The subset of yt-dlp's info JSON MediaFlow reads. Everything else is ignored. */
+/** The subset of yt-dlp's info JSON YT-DLP++ reads. Everything else is ignored. */
 const rawInfoSchema = z
   .object({
     _type: z.string().nullish(),
@@ -244,11 +244,11 @@ function parseInfo(stdout: string): RawInfo {
   try {
     json = JSON.parse(stdout)
   } catch (error) {
-    throw new AppError('OPERATION_FAILED', 'yt-dlp returned data MediaFlow could not read.', { cause: error })
+    throw new AppError('OPERATION_FAILED', 'yt-dlp returned data YT-DLP++ could not read.', { cause: error })
   }
   const parsed = rawInfoSchema.safeParse(json)
   if (!parsed.success) {
-    throw new AppError('OPERATION_FAILED', 'yt-dlp returned data MediaFlow could not read.', { cause: parsed.error })
+    throw new AppError('OPERATION_FAILED', 'yt-dlp returned data YT-DLP++ could not read.', { cause: parsed.error })
   }
   return parsed.data
 }

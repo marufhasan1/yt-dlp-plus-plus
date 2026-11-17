@@ -79,7 +79,7 @@ const resumeAll = () => bulk(() => store.resumeAll(), (n) => `${plural(n)} resum
       <RotateCcw :size="18" class="shrink-0 text-warning" aria-hidden="true" />
       <div class="min-w-0 flex-1">
         <p class="text-[13.5px] font-medium">
-          {{ plural(store.interrupted.length) }} {{ store.interrupted.length === 1 ? 'was' : 'were' }} interrupted when MediaFlow closed
+          {{ plural(store.interrupted.length) }} {{ store.interrupted.length === 1 ? 'was' : 'were' }} interrupted when YT-DLP++ closed
         </p>
         <p class="text-[12.5px] text-fg-muted">The partial downloads were kept. Resume them to continue where they stopped.</p>
       </div>

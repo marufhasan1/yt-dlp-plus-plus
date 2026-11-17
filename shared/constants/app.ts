@@ -1,10 +1,10 @@
 /** Name of the API object exposed on `window` by the preload bridge. */
-export const BRIDGE_KEY = 'mediaflow'
+export const BRIDGE_KEY = 'ytdlpp'
 
 /** Environment variable that redirects user data during automated tests. Ignored in packaged builds. */
-export const USER_DATA_DIR_ENV = 'MEDIAFLOW_USER_DATA_DIR'
+export const USER_DATA_DIR_ENV = 'YTDLPP_USER_DATA_DIR'
 
-export const DATABASE_FILENAME = 'mediaflow.db'
+export const DATABASE_FILENAME = 'ytdlpp.db'
 
 /** Window background colours, kept in sync with the --bg tokens in src/assets/main.css. */
 export const WINDOW_BACKGROUND = {

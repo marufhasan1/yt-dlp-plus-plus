@@ -45,14 +45,14 @@ const CHANNELS: readonly SegmentOption<AppSettings['ytdlpChannel']>[] = [
 </script>
 
 <template>
-  <SettingsSection id="updates" title="Updates" description="How MediaFlow looks for new versions of itself and its media engines.">
+  <SettingsSection id="updates" title="Updates" description="How YT-DLP++ looks for new versions of itself and its media engines.">
     <SettingsRow label="Check for updates automatically" description="Looks for new versions in the background. Nothing is downloaded without your choice, except yt-dlp if enabled below.">
       <ToggleSwitch v-model="autoCheck" label="Check for updates automatically" data-testid="setting-auto-check" />
     </SettingsRow>
     <SettingsRow label="Check frequency" description="How often the automatic check runs.">
       <div class="w-40"><SelectField v-model="interval" :options="INTERVALS" :disabled="!autoCheck" label="Check frequency" data-testid="setting-check-interval" /></div>
     </SettingsRow>
-    <SettingsRow label="Tell me about new MediaFlow versions" description="Shows a notice when an automatic check finds a new version of the app.">
+    <SettingsRow label="Tell me about new YT-DLP++ versions" description="Shows a notice when an automatic check finds a new version of the app.">
       <ToggleSwitch v-model="notifications" :disabled="!autoCheck" label="Application update notifications" data-testid="setting-app-notifications" />
     </SettingsRow>
     <SettingsRow label="yt-dlp release channel" description="Nightly builds get fixes for sites days or weeks earlier, but are less tested. Stable is recommended.">
@@ -60,7 +60,7 @@ const CHANNELS: readonly SegmentOption<AppSettings['ytdlpChannel']>[] = [
     </SettingsRow>
     <SettingsRow
       label="Update yt-dlp automatically"
-      description="Installs new yt-dlp versions found by the automatic check, when no downloads are running. Only MediaFlow's own copy is updated; the previous version is kept for rolling back."
+      description="Installs new yt-dlp versions found by the automatic check, when no downloads are running. Only YT-DLP++'s own copy is updated; the previous version is kept for rolling back."
     >
       <ToggleSwitch v-model="autoUpdateYtdlp" :disabled="!autoCheck" label="Update yt-dlp automatically" data-testid="setting-auto-update-ytdlp" />
     </SettingsRow>

@@ -84,14 +84,14 @@ const MAX_JSON_BYTES = 128 * 1024 * 1024
 const THUMBNAIL_CONCURRENCY = 4
 
 /**
- * Converts flat playlist JSON into what MediaFlow stores. Entries that are
+ * Converts flat playlist JSON into what YT-DLP++ stores. Entries that are
  * themselves playlists (a channel's tab list) or that have no usable link are
  * dropped; private, deleted and live entries are kept but marked unavailable.
  */
 export function parseFlatPlaylist(json: unknown, requestedUrl: string, maxEntries = MAX_PLAYLIST_ENTRIES): PlaylistInput {
   const parsed = flatPlaylistSchema.safeParse(json)
   if (!parsed.success) {
-    throw new AppError('OPERATION_FAILED', 'yt-dlp returned playlist data MediaFlow could not read.', { cause: parsed.error })
+    throw new AppError('OPERATION_FAILED', 'yt-dlp returned playlist data YT-DLP++ could not read.', { cause: parsed.error })
   }
   const info = parsed.data
   const extractor = (info.extractor_key ?? 'generic').toLowerCase()
@@ -205,7 +205,7 @@ export class PlaylistService {
       try {
         json = JSON.parse(result.stdout)
       } catch (error) {
-        throw new AppError('OPERATION_FAILED', 'yt-dlp returned playlist data MediaFlow could not read.', { cause: error })
+        throw new AppError('OPERATION_FAILED', 'yt-dlp returned playlist data YT-DLP++ could not read.', { cause: error })
       }
       const input = parseFlatPlaylist(json, url)
       const parsedThumbs = flatPlaylistSchema.safeParse(json)

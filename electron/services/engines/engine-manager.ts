@@ -193,7 +193,8 @@ export class EngineManager {
     return {
       ytdlp,
       ffmpegLocation: ffmpeg && ffprobe ? dirname(ffmpeg) : null,
-      deno: this.executablePath('deno')
+      deno: this.executablePath('deno'),
+      ytdlpVersion: this.statuses['yt-dlp'].version
     }
   }
 

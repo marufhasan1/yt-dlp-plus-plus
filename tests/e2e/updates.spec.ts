@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { homedir, tmpdir } from 'node:os'
@@ -16,13 +16,18 @@ import { USER_DATA_DIR_ENV } from '../../shared/constants/app'
  */
 
 const projectRoot = join(__dirname, '..', '..')
+/** A version newer than the app's, for the test update feed. */
+const NEXT_VERSION = (() => {
+  const [major = 0] = (JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8')) as { version: string }).version.split('.').map(Number)
+  return `${major + 1}.0.0`
+})()
 let userDataDir: string
 let server: Server | null = null
 let cacheDirName: string
 const launched: ElectronApplication[] = []
 
 async function launch(extraEnv: Record<string, string> = {}): Promise<{ app: ElectronApplication; page: Page; consoleErrors: string[] }> {
-  const excluded = new Set(['ELECTRON_RENDERER_URL', 'ELECTRON_RUN_AS_NODE', 'PATH', 'MEDIAFLOW_DEV_UPDATE_CONFIG'])
+  const excluded = new Set(['ELECTRON_RENDERER_URL', 'ELECTRON_RUN_AS_NODE', 'PATH', 'YTDLPP_DEV_UPDATE_CONFIG'])
   const fakePath = join(userDataDir, 'fake-path')
   mkdirSync(fakePath, { recursive: true })
   const env: Record<string, string> = { [USER_DATA_DIR_ENV]: userDataDir, PATH: fakePath, ...extraEnv }
@@ -45,9 +50,9 @@ async function launch(extraEnv: Record<string, string> = {}): Promise<{ app: Ele
 async function serveFeed(options: { corruptDownload?: boolean } = {}): Promise<string> {
   const installer = Buffer.alloc(256 * 1024, 7)
   const sha512 = createHash('sha512').update(installer).digest('base64')
-  const name = 'MediaFlow-Setup-0.2.0-x64.exe'
+  const name = `yt-dlp-plus-plus-${NEXT_VERSION}-setup.exe`
   const latest = [
-    'version: 0.2.0',
+    `version: ${NEXT_VERSION}`,
     'files:',
     `  - url: ${name}`,
     `    sha512: ${sha512}`,
@@ -55,7 +60,7 @@ async function serveFeed(options: { corruptDownload?: boolean } = {}): Promise<s
     `path: ${name}`,
     `sha512: ${sha512}`,
     "releaseDate: '2026-11-08T10:00:00.000Z'",
-    "releaseNotes: '<h2>MediaFlow 0.2.0</h2><ul><li>Faster downloads</li><li>Fixes &amp; improvements</li></ul><script>alert(1)</script>'"
+    `releaseNotes: '<h2>YT-DLP++ ${NEXT_VERSION}</h2><ul><li>Faster downloads</li><li>Fixes &amp; improvements</li></ul><script>alert(1)</script>'`
   ].join('\n')
   server = createServer((request, response) => {
     if (request.url?.startsWith('/latest.yml')) {
@@ -78,8 +83,8 @@ async function serveFeed(options: { corruptDownload?: boolean } = {}): Promise<s
 }
 
 test.beforeEach(() => {
-  userDataDir = mkdtempSync(join(tmpdir(), 'mediaflow-e2e-up-'))
-  cacheDirName = `mediaflow-e2e-updater-${randomUUID().slice(0, 8)}`
+  userDataDir = mkdtempSync(join(tmpdir(), 'ytdlpp-e2e-up-'))
+  cacheDirName = `ytdlpp-e2e-updater-${randomUUID().slice(0, 8)}`
 })
 
 test.afterEach(async () => {
@@ -114,7 +119,7 @@ test('shows every component and explains what cannot be updated here', async () 
 test('lists the update history', async () => {
   const first = await launch()
   await first.app.close()
-  const db = new Database(join(userDataDir, 'mediaflow.db'))
+  const db = new Database(join(userDataDir, 'ytdlpp.db'))
   const insert = db.prepare('INSERT INTO update_history (component, previous_version, new_version, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?)')
   insert.run('yt-dlp', '2026.09.01', '2026.10.26', 'success', null, '2026-11-01T10:00:00.000Z')
   insert.run('ffmpeg', '9.0.1', '9.0.2', 'rolled_back', 'The new FFmpeg did not work after installation. The previous version was restored.', '2026-11-02T10:00:00.000Z')
@@ -125,7 +130,7 @@ test('lists the update history', async () => {
   await page.getByTestId('nav-updates').click()
   const rows = page.getByTestId('update-history').locator('tbody tr')
   await expect(rows).toHaveCount(3)
-  await expect(rows.nth(0)).toContainText('MediaFlow')
+  await expect(rows.nth(0)).toContainText('YT-DLP++')
   await expect(rows.nth(0)).toHaveAttribute('data-status', 'failed')
   await expect(rows.nth(1)).toContainText('9.0.1 → 9.0.2')
   await expect(rows.nth(1)).toContainText('Rolled back')
@@ -144,7 +149,7 @@ test('saves update settings', async () => {
   await page.getByTestId('setting-auto-update-ytdlp').click()
   await page.getByTestId('setting-check-engines').click()
   await expect
-    .poll(() => page.evaluate(async () => (await (globalThis as unknown as { mediaflow: { settings: { get(): Promise<{ data: Record<string, unknown> }> } } }).mediaflow.settings.get()).data))
+    .poll(() => page.evaluate(async () => (await (globalThis as unknown as { ytdlpp: { settings: { get(): Promise<{ data: Record<string, unknown> }> } } }).ytdlpp.settings.get()).data))
     .toMatchObject({ updateCheckIntervalHours: 72, ytdlpChannel: 'nightly', autoUpdateYtdlp: true, checkEngineUpdates: false })
   await page.getByTestId('setting-auto-check').click()
   await page.getByTestId('nav-updates').click()
@@ -162,7 +167,7 @@ test('guards update IPC', async () => {
   const { app, page } = await launch()
   const results = await page.evaluate(async () => {
     type Result = Promise<unknown>
-    const updates = (globalThis as unknown as { mediaflow: { updates: Record<string, (arg?: unknown) => Result> } }).mediaflow.updates
+    const updates = (globalThis as unknown as { ytdlpp: { updates: Record<string, (arg?: unknown) => Result> } }).ytdlpp.updates
     return {
       badComponent: await updates['check']!('python'),
       badTarget: await updates['updateEngine']!('../../yt-dlp'),
@@ -191,12 +196,12 @@ test('guards update IPC', async () => {
 test('checks, downloads and verifies an application update from its feed', async () => {
   test.skip(process.platform !== 'win32', 'The NSIS updater is exercised on Windows; macOS and Linux need signed or AppImage builds.')
   const config = await serveFeed()
-  const { app, page, consoleErrors } = await launch({ MEDIAFLOW_DEV_UPDATE_CONFIG: config })
+  const { app, page, consoleErrors } = await launch({ YTDLPP_DEV_UPDATE_CONFIG: config })
   await page.getByTestId('nav-updates').click()
   const card = page.getByTestId('update-card-app')
   await card.getByTestId('app-check').click()
   await expect(card.getByTestId('update-state')).toHaveAttribute('data-state', 'available')
-  await expect(card.getByTestId('latest-version')).toContainText('0.2.0')
+  await expect(card.getByTestId('latest-version')).toContainText(NEXT_VERSION)
   // Release notes are shown as text; the script tag never reaches the page.
   await card.getByTestId('app-release-notes').locator('summary').click()
   await expect(card.getByTestId('app-release-notes')).toContainText('• Faster downloads')
@@ -216,7 +221,7 @@ test('checks, downloads and verifies an application update from its feed', async
 test('rejects an application update whose download does not match its checksum', async () => {
   test.skip(process.platform !== 'win32', 'The NSIS updater is exercised on Windows.')
   const config = await serveFeed({ corruptDownload: true })
-  const { app, page } = await launch({ MEDIAFLOW_DEV_UPDATE_CONFIG: config })
+  const { app, page } = await launch({ YTDLPP_DEV_UPDATE_CONFIG: config })
   await page.getByTestId('nav-updates').click()
   const card = page.getByTestId('update-card-app')
   await card.getByTestId('app-check').click()

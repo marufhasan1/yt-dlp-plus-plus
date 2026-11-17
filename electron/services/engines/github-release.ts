@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-/** The subset of the GitHub Releases API response MediaFlow relies on. */
+/** The subset of the GitHub Releases API response YT-DLP++ relies on. */
 export const githubAssetSchema = z.object({
   name: z.string(),
   size: z.number().int().nonnegative(),

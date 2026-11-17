@@ -122,7 +122,7 @@ export const downloadRequestSchema = z
 
 export const jobIdSchema = z.object({ id: z.uuid() }).strict()
 
-/** Upper bound on entries MediaFlow lists for one playlist or channel. */
+/** Upper bound on entries YT-DLP++ lists for one playlist or channel. */
 export const MAX_PLAYLIST_ENTRIES = 1000
 
 export const playlistIdSchema = z.object({ id: z.uuid() }).strict()

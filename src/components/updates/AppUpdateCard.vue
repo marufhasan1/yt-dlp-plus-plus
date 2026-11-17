@@ -21,7 +21,7 @@ const toasts = useToastStore()
 const busy = ref(false)
 const confirmInstall = ref(false)
 
-const name = computed(() => appStore.info?.name ?? 'MediaFlow')
+const name = computed(() => appStore.info?.name ?? 'YT-DLP++')
 const canCheck = computed(() => !['checking', 'downloading', 'unavailable'].includes(props.update.state))
 
 async function run(action: () => Promise<unknown>, failure: string): Promise<void> {

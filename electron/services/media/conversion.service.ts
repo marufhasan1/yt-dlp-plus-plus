@@ -286,7 +286,7 @@ export class ConversionService {
       await mkdir(outputDir, { recursive: true })
       const base = outputBaseName(input.path)
       // FFmpeg chooses the muxer from the extension, so the temporary name keeps it.
-      temp = join(outputDir, `${base}.mediaflow-${id.slice(0, 8)}.${format}`)
+      temp = join(outputDir, `${base}.ytdlpp-${id.slice(0, 8)}.${format}`)
       const plan = buildConversionArgs(input.path, temp, format, quality, probe)
       this.update(state, { qualityLabel: plan.qualityLabel }, true)
       this.deps.logger.info(`Converting ${input.input.name} to ${format} (${plan.qualityLabel})`)

@@ -12,9 +12,35 @@ const { join } = require('node:path')
 const { FuseV1Options, getCurrentFuseWire } = require('@electron/fuses')
 const asar = require('@electron/asar')
 
+// `--all` checks every unpacked build electron-builder left in release/<version>/.
+const UNPACKED = {
+  'win-unpacked': ['win32', 'x64'],
+  'win-arm64-unpacked': ['win32', 'arm64'],
+  mac: ['darwin', 'x64'],
+  'mac-arm64': ['darwin', 'arm64'],
+  'linux-unpacked': ['linux', 'x64'],
+  'linux-arm64-unpacked': ['linux', 'arm64']
+}
+if (process.argv[2] === '--all') {
+  const { version } = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'))
+  const releaseDir = join(__dirname, '..', 'release', version)
+  const found = existsSync(releaseDir) ? readdirSync(releaseDir).filter((name) => name in UNPACKED) : []
+  if (found.length === 0) {
+    console.error(`No unpacked builds in ${releaseDir}`)
+    process.exit(1)
+  }
+  const { spawnSync } = require('node:child_process')
+  let failed = false
+  for (const name of found) {
+    const result = spawnSync(process.execPath, [__filename, join(releaseDir, name), ...UNPACKED[name]], { stdio: 'inherit' })
+    failed ||= result.status !== 0
+  }
+  process.exit(failed ? 1 : 0)
+}
+
 const [dir, platform, arch] = process.argv.slice(2)
 if (!dir || !platform || !arch) {
-  console.error('usage: node scripts/verify-package.cjs <unpacked app folder> <platform> <arch>')
+  console.error('usage: node scripts/verify-package.cjs <unpacked app folder> <platform> <arch> | --all')
   process.exit(2)
 }
 const problems = []
@@ -23,9 +49,11 @@ const ok = (condition, message) => {
 }
 
 const { productName } = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'))
+// Linux executables are named by linux.executableName in electron-builder.yml (not the product name).
+const linuxExecutable = /^\s+executableName:\s*(\S+)/m.exec(readFileSync(join(__dirname, '..', 'electron-builder.yml'), 'utf8'))?.[1] ?? productName
 const resources = platform === 'darwin' ? join(dir, `${productName}.app`, 'Contents', 'Resources') : join(dir, 'resources')
 const executable =
-  platform === 'win32' ? join(dir, `${productName}.exe`) : platform === 'darwin' ? join(dir, `${productName}.app`) : join(dir, readdirSync(dir).find((f) => f.toLowerCase() === productName.toLowerCase()) ?? productName)
+  platform === 'win32' ? join(dir, `${productName}.exe`) : platform === 'darwin' ? join(dir, `${productName}.app`) : join(dir, linuxExecutable)
 
 ;(async () => {
   // ── Fuses ──

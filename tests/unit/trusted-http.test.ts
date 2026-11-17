@@ -27,7 +27,7 @@ async function expectAppError(promise: Promise<unknown>, code: string): Promise<
 
 let dir: string
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-http-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-http-'))
 })
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true })

@@ -56,7 +56,7 @@ const BTBN_TARGETS: Record<string, string> = {
 /**
  * Picks the newest stable-branch LGPL static build for `buildTarget` from an
  * immutable `autobuild-*` release, e.g. `ffmpeg-n9.0.2-42-gd7643a0fe3-win64-lgpl-9.0.zip`.
- * LGPL builds include every encoder MediaFlow needs (LAME, Opus, AAC, FLAC).
+ * LGPL builds include every encoder YT-DLP++ needs (LAME, Opus, AAC, FLAC).
  */
 export function selectBtbnAsset(
   release: GithubRelease,

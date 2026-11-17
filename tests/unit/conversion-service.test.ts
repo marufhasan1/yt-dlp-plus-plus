@@ -54,7 +54,7 @@ let outputCheck: () => string
 let killed: number
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-convsvc-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-convsvc-'))
   mkdirSync(join(dir, 'music'))
   mkdirSync(join(dir, 'out'))
   files = ['One.wav', 'Two.wav'].map((name) => {
@@ -77,7 +77,7 @@ function service(overrides: Partial<ConversionServiceDeps> = {}): ConversionServ
     acquire: () => () => {},
     run: async (_file, args): Promise<RunResult> => {
       const target = args.at(-1)!
-      const stdout = target.includes('.mediaflow-') ? outputCheck() : inputProbe
+      const stdout = target.includes('.ytdlpp-') ? outputCheck() : inputProbe
       return { exitCode: 0, signal: null, stdout, stderr: '', timedOut: false }
     },
     dialogs: { pickFiles: async () => files, pickFolder: async () => join(dir, 'chosen') },
@@ -110,7 +110,7 @@ describe('ConversionService', () => {
     await vi.waitFor(() => expect(children).toHaveLength(1))
     expect(job(s, a!.id).status).toBe('converting')
     expect(job(s, b!.id).status).toBe('queued')
-    expect(children[0]!.output).toBe(join(dir, 'out', `One.mediaflow-${a!.id.slice(0, 8)}.mp3`))
+    expect(children[0]!.output).toBe(join(dir, 'out', `One.ytdlpp-${a!.id.slice(0, 8)}.mp3`))
 
     children[0]!.progress(5, 50)
     await vi.waitFor(() => expect(job(s, a!.id)).toMatchObject({ progress: 25, speed: 50, eta: 0 }))

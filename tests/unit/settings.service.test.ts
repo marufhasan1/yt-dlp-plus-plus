@@ -89,7 +89,7 @@ describe('SettingsService', () => {
 describe('SettingsService download folder (main process only)', () => {
   let folder: string
   beforeEach(() => {
-    folder = mkdtempSync(join(tmpdir(), 'mediaflow-dl-'))
+    folder = mkdtempSync(join(tmpdir(), 'ytdlpp-dl-'))
   })
   afterEach(() => {
     rmSync(folder, { recursive: true, force: true })
@@ -104,7 +104,7 @@ describe('SettingsService download folder (main process only)', () => {
 
   it.each([
     ['a relative path', 'downloads'],
-    ['a missing folder', join(tmpdir(), 'mediaflow-does-not-exist-12345')]
+    ['a missing folder', join(tmpdir(), 'ytdlpp-does-not-exist-12345')]
   ])('rejects %s', async (_label, path) => {
     const service = new SettingsService(repository, silentLogger)
     await expect(service.setDownloadDirectory(path)).rejects.toBeInstanceOf(AppError)

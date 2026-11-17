@@ -250,7 +250,7 @@ const summary = computed(() => {
       v-else
       :icon="AudioLines"
       title="No conversions yet"
-      description="Converted files appear here with their progress. The list is kept until MediaFlow closes; the files stay on disk."
+      description="Converted files appear here with their progress. The list is kept until YT-DLP++ closes; the files stay on disk."
     />
   </div>
 </template>

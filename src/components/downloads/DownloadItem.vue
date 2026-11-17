@@ -82,7 +82,7 @@ async function act(action: () => Promise<unknown>, failure: string): Promise<voi
       <div v-else-if="job.status === 'paused'" class="mt-2.5" data-testid="paused-info">
         <ProgressBar :value="job.progress / 100" :label="`Progress of ${job.title}`" class="opacity-60" />
         <div class="mt-1.5 flex justify-between gap-3 text-[12px] text-fg-muted">
-          <span>{{ job.interrupted ? 'Interrupted when MediaFlow closed — resume to continue' : 'Paused — partial download kept' }}</span>
+          <span>{{ job.interrupted ? 'Interrupted when YT-DLP++ closed — resume to continue' : 'Paused — partial download kept' }}</span>
           <span class="font-mono">{{ Math.floor(job.progress) }}%</span>
         </div>
       </div>

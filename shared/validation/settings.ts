@@ -41,7 +41,7 @@ export const settingsFields = {
   maxRetries: z.number().int().min(0).max(10),
   /** Seconds yt-dlp waits for a network response before giving up on it. */
   networkTimeoutSeconds: z.number().int().min(5).max(300),
-  /** Proxy for yt-dlp and MediaFlow's own requests; null for a direct connection. */
+  /** Proxy for yt-dlp and YT-DLP++'s own requests; null for a direct connection. */
   proxy: proxySchema,
   /** Download speed limit per download in KiB/s; null for no limit. */
   speedLimitKib: z.number().int().min(64).max(1_048_576).nullable(),
@@ -53,11 +53,11 @@ export const settingsFields = {
   updateCheckIntervalHours: z.union([z.literal(6), z.literal(12), z.literal(24), z.literal(72), z.literal(168)]),
   /** yt-dlp release channel: stable releases, or nightly builds with the latest site fixes. */
   ytdlpChannel: z.enum(['stable', 'nightly']),
-  /** Install new yt-dlp versions automatically (only a copy MediaFlow manages, and only when idle). Opt-in. */
+  /** Install new yt-dlp versions automatically (only a copy YT-DLP++ manages, and only when idle). Opt-in. */
   autoUpdateYtdlp: z.boolean(),
   /** Include FFmpeg/FFprobe and Deno in automatic checks. */
   checkEngineUpdates: z.boolean(),
-  /** Show a notice when a new MediaFlow version is found by an automatic check. */
+  /** Show a notice when a new YT-DLP++ version is found by an automatic check. */
   appUpdateNotifications: z.boolean()
 }
 

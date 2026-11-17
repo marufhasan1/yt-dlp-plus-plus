@@ -48,7 +48,7 @@ export interface InstalledEngineInfo {
   /** Full build string reported by the binary (FFmpeg: "n9.0.2-48-gd4070a14ce-20261109"). */
   build: string | null
   source: EngineSource | null
-  /** Install record, for copies MediaFlow manages. */
+  /** Install record, for copies YT-DLP++ manages. */
   record: ManifestEntry | null
 }
 

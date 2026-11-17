@@ -5,7 +5,7 @@ import type { Logger } from '../../utils/logger'
 import { runProcess, type ProcessRunner } from '../../utils/process'
 
 /*
- * yt-dlp outlives a crashed MediaFlow: on Windows nothing ends a child when its
+ * yt-dlp outlives a crashed YT-DLP++: on Windows nothing ends a child when its
  * parent dies, and on Unix it runs in its own process group. Observed with the
  * real app: after a hard kill, yt-dlp kept downloading into the job's partial
  * files. Resuming that job would then start a second yt-dlp writing the same
@@ -13,7 +13,7 @@ import { runProcess, type ProcessRunner } from '../../utils/process'
  * folder, and at the next start any still-running owner is stopped first.
  */
 
-export const OWNER_FILE = '.mediaflow-owner.json'
+export const OWNER_FILE = '.ytdlpp-owner.json'
 
 export interface OwnerRecord {
   pid: number

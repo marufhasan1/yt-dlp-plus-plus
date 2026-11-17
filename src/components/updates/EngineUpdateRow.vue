@@ -26,7 +26,7 @@ const provider = computed(() => engines.snapshot?.providers[props.target] ?? nul
 const inUse = computed(() => engines.snapshot?.inUse.includes(props.target) ?? false)
 const updateLabel = computed(() => {
   const u = props.update
-  if (u.systemCopy) return `Install MediaFlow's ${u.latestVersion}`
+  if (u.systemCopy) return `Install YT-DLP++'s ${u.latestVersion}`
   if (u.channelSwitch) return `Switch to ${u.channel} (${u.latestVersion})`
   return `Update to ${u.latestVersion}`
 })
@@ -125,7 +125,7 @@ async function rollback(): Promise<void> {
         Downloaded from <span class="font-medium text-fg">{{ provider.name }}</span> and verified against the checksum its provider publishes. It is run
         once before and once after it replaces {{ update.installedVersion }}; if either check fails, {{ update.installedVersion }} stays.
       </p>
-      <p v-if="update.systemCopy" class="mt-2">Your system's copy is not changed; MediaFlow uses its own copy from now on.</p>
+      <p v-if="update.systemCopy" class="mt-2">Your system's copy is not changed; YT-DLP++ uses its own copy from now on.</p>
       <p v-else class="mt-2">{{ update.installedVersion }} is kept, so you can roll back.</p>
       <p v-if="update.channelSwitch" class="mt-2">{{ update.message }}</p>
       <p v-if="inUse" class="mt-2 font-medium text-fg">{{ name }} is in use right now; the update starts as soon as those downloads and conversions finish.</p>

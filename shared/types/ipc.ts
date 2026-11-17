@@ -114,8 +114,8 @@ export interface IpcEventContract {
 
 export type Unsubscribe = () => void
 
-/** The API surface exposed to the renderer as `window.mediaflow`. */
-export interface MediaFlowApi {
+/** The API surface exposed to the renderer as `window.ytdlpp`. */
+export interface YtDlppApi {
   app: {
     getInfo(): Promise<IpcResult<AppInfo>>
     openLogsFolder(): Promise<IpcResult<void>>

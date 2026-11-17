@@ -12,7 +12,7 @@ import type {
 import { estimateAudioBytes } from '@shared/media/estimate'
 
 /**
- * Turns yt-dlp's format list into the choices MediaFlow offers, and a choice
+ * Turns yt-dlp's format list into the choices YT-DLP++ offers, and a choice
  * into validated yt-dlp arguments. Pure functions: no I/O, fully testable
  * against real `--dump-single-json` output.
  */
@@ -439,7 +439,7 @@ const AUTO_SORT_CODEC: Record<VideoContainer, VideoCodec | null> = { mp4: 'h264'
 const AUDIO_SORT_CODEC: Record<AudioFormat, string | null> = { m4a: 'aac', opus: 'opus', mp3: null, wav: null, flac: null }
 
 /**
- * A plan for a video MediaFlow has not analysed (a playlist entry), expressed
+ * A plan for a video YT-DLP++ has not analysed (a playlist entry), expressed
  * as yt-dlp format filters and sort order so that yt-dlp picks the same kind
  * of streams `buildDownloadPlan` would:
  *  - resolution and frame rate first (otherwise a muxed 360p stream can win on

@@ -35,7 +35,7 @@ describe('locating engines', () => {
   const put = (dir: string, name: 'yt-dlp' | 'ffmpeg' | 'ffprobe') => writeFileSync(join(dir, executableName(name, platform)), 'x')
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'mediaflow-locate-'))
+    root = mkdtempSync(join(tmpdir(), 'ytdlpp-locate-'))
     for (const key of Object.keys(dirs) as (keyof typeof dirs)[]) {
       dirs[key] = join(root, key)
       mkdirSync(dirs[key])

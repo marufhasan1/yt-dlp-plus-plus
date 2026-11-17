@@ -34,10 +34,10 @@ beforeAll(async () => {
     ffprobe = found.ffprobe.path
   }
   if (!ffmpeg) return
-  dir = mkdtempSync(join(tmpdir(), 'mediaflow-convert-'))
+  dir = mkdtempSync(join(tmpdir(), 'ytdlpp-convert-'))
   mkdirSync(join(dir, 'in'))
   mkdirSync(join(dir, 'out'))
-  await generate(['-f', 'lavfi', '-i', 'sine=frequency=440:duration=6', '-ac', '2', '-metadata', 'title=Tone Ünïcode', '-metadata', 'artist=MediaFlow', join(dir, 'in', 'Tést fïle ñ 🎵.wav')])
+  await generate(['-f', 'lavfi', '-i', 'sine=frequency=440:duration=6', '-ac', '2', '-metadata', 'title=Tone Ünïcode', '-metadata', 'artist=YT-DLP++', join(dir, 'in', 'Tést fïle ñ 🎵.wav')])
   await generate(['-f', 'lavfi', '-i', 'testsrc=duration=4:size=320x240:rate=25', '-f', 'lavfi', '-i', 'sine=duration=4', '-c:v', 'libx264', '-c:a', 'aac', '-shortest', join(dir, 'in', 'clip.mp4')])
   await generate(['-f', 'lavfi', '-i', 'color=c=blue:size=200x200:duration=1', '-frames:v', '1', join(dir, 'in', 'cover.png')])
   await generate(['-i', join(dir, 'in', 'Tést fïle ñ 🎵.wav'), '-i', join(dir, 'in', 'cover.png'), '-map', '0:a', '-map', '1:v', '-c:a', 'libmp3lame', '-b:a', '128k', '-c:v', 'png', '-disposition:v', 'attached_pic', '-id3v2_version', '3', join(dir, 'in', 'with cover.mp3')])
@@ -77,7 +77,7 @@ async function probeFile(path: string) {
   return parseProbe(JSON.parse(result.stdout))
 }
 
-describe.runIf(process.env['MEDIAFLOW_SKIP_FFMPEG'] !== '1')('ConversionService with real FFmpeg', () => {
+describe.runIf(process.env['YTDLPP_SKIP_FFMPEG'] !== '1')('ConversionService with real FFmpeg', () => {
   it('inspects picked files, including damaged ones', async (context) => {
     if (!ffmpeg) context.skip()
     const service = converter([join(dir, 'in', 'Tést fïle ñ 🎵.wav'), join(dir, 'in', 'clip.mp4'), join(dir, 'in', 'broken.mp3')])
@@ -126,9 +126,9 @@ describe.runIf(process.env['MEDIAFLOW_SKIP_FFMPEG'] !== '1')('ConversionService 
       expect(out.durationSeconds).toBeCloseTo(6, 0)
     }
     const mp3 = await probeFile(jobs.find((j) => j.format === 'mp3')!.outputPath!)
-    expect(mp3.source).toMatchObject({ title: 'Tone Ünïcode', artist: 'MediaFlow' })
+    expect(mp3.source).toMatchObject({ title: 'Tone Ünïcode', artist: 'YT-DLP++' })
     // No temporary files are left behind.
-    expect(readdirSync(join(dir, 'out')).some((name) => name.includes('.mediaflow-'))).toBe(false)
+    expect(readdirSync(join(dir, 'out')).some((name) => name.includes('.ytdlpp-'))).toBe(false)
   }, 120_000)
 
   it('extracts audio from video, keeps cover art, and never overwrites', async (context) => {

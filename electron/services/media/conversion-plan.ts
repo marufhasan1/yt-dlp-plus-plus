@@ -281,7 +281,7 @@ const ERRORS: { pattern: RegExp; message: string }[] = [
     message: 'This file is damaged or is not a supported audio or video file.'
   },
   { pattern: /No such file or directory/i, message: 'The file no longer exists or was moved.' },
-  { pattern: /Permission denied|Access is denied/i, message: 'MediaFlow is not allowed to read the file or write to the output folder.' },
+  { pattern: /Permission denied|Access is denied/i, message: 'YT-DLP++ is not allowed to read the file or write to the output folder.' },
   { pattern: /No space left on device|not enough space/i, message: 'There is not enough free disk space.' },
   { pattern: /Unknown encoder|Encoder not found|encoder.*not found/i, message: 'The installed FFmpeg build cannot encode this format.' },
   { pattern: /does not contain any stream|Output file .* does not contain|matches no streams/i, message: 'This file has no audio to convert.' }
