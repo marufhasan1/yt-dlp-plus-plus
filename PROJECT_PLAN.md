@@ -622,10 +622,11 @@ confirmed).
 - [x] Documentation: README (installing, verifying, releasing), CHANGELOG, SECURITY
 - [x] GitHub Actions: CI on three OSes and a tag-driven release with checksums and update manifests
 - [x] Release preparation: version 1.0.0, changelog section, signing/notarization wiring via secrets
-- [ ] Not done here: running the workflows on GitHub (no repository), macOS/Linux packages, code-signing certificates
+- [ ] Not done: macOS/Linux packages (their CI test runs fail — 1 test on macOS, 2 on Ubuntu, 2026-11-17), code-signing certificates
 
-Deliverable: publicly distributable v1.0 — **met for Windows locally; macOS and Linux
-packages depend on the first CI/Release run** (see the Phase 8 report).
+Deliverable: publicly distributable v1.0 — **Windows only** (user decision, 2026-11-17): the
+release workflow verifies on Windows and builds only Windows packages; macOS and Linux stay
+in the matrix as comments until their CI failures are fixed.
 
 ---
 
@@ -1158,9 +1159,9 @@ a breaking `--force` downgrade).
 
 ### Known issues and follow-ups
 
-1. **Before tagging v1.0.0**: push to a GitHub repository, let CI pass on all three systems,
-   and (recommended) add signing secrets. The first Release run is the first macOS and Linux
-   packaging; review its draft before publishing.
+1. **v1.0.0 is Windows-only.** First CI run on GitHub (2026-11-17): Windows passed; macOS
+   had 1 failing unit test and Ubuntu 2. Fix those, then re-enable macOS and Linux in
+   `release.yml`. Adding signing secrets is recommended before publishing.
 2. Builds are unsigned until certificates are configured: SmartScreen/Gatekeeper warnings,
    and macOS cannot install updates in place.
 3. The Windows installer contains both architectures (241 MB download for every user).

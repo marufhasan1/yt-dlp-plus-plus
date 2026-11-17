@@ -1,6 +1,10 @@
-# Builds installers for every platform from a version tag (v1.0.0, …) and publishes them,
-# with checksums and the update manifests electron-updater reads, as a draft GitHub Release.
-# A maintainer reviews the draft and publishes it; only published releases reach users.
+# Builds installers from a version tag (v1.0.0, …) and publishes them, with checksums and the
+# update manifests electron-updater reads, as a draft GitHub Release. A maintainer reviews the
+# draft and publishes it; only published releases reach users.
+#
+# Releases are currently Windows-only: the macOS and Linux test suites do not pass yet, so
+# the checks run on Windows and only the Windows packages are built. To release macOS and
+# Linux again, uncomment their entries in the build matrix (and fix their CI failures first).
 #
 # Secrets (all optional; without them the builds are unsigned):
 #   WIN_CSC_LINK, WIN_CSC_KEY_PASSWORD       Windows code-signing certificate (.pfx, base64) and password
@@ -22,7 +26,7 @@ concurrency:
 jobs:
   verify:
     name: Verify (lint, tests, licenses)
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -33,6 +37,7 @@ jobs:
           node-version: 22
           cache: npm
       - name: Tag matches package.json version
+        shell: bash
         run: |
           version="$(node -p "require('./package.json').version")"
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
@@ -40,12 +45,11 @@ jobs:
             exit 1
           fi
       - name: Changelog has notes for this version
+        shell: bash
         run: grep -q "^## \[${GITHUB_REF_NAME#v}\]" CHANGELOG.md || { echo "::error::CHANGELOG.md has no section for ${GITHUB_REF_NAME#v}"; exit 1; }
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
-      - name: Install FFmpeg for the conversion tests
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - run: npm test
       - run: npm run build
       - run: node scripts/licenses.mjs --check
@@ -61,12 +65,13 @@ jobs:
           - name: Windows
             os: windows-latest
             args: --win
-          - name: macOS
-            os: macos-latest
-            args: --mac
-          - name: Linux
-            os: ubuntu-latest
-            args: --linux
+          # Not released yet (see the note at the top):
+          # - name: macOS
+          #   os: macos-latest
+          #   args: --mac
+          # - name: Linux
+          #   os: ubuntu-latest
+          #   args: --linux
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -162,7 +167,7 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           awk -v v="$version" '$0 ~ "^## \\[" v "\\]" {found=1; next} found && /^## \[/ {exit} found {print}' CHANGELOG.md > notes.md
-          printf '\n---\nVerify downloads against `SHA256SUMS.txt`. YT-DLP++ downloads its media engines (yt-dlp, FFmpeg, Deno) on first use, with your confirmation.\n' >> notes.md
+          printf '\n---\nThis release is for Windows (x64 and ARM64). Verify downloads against `SHA256SUMS.txt`. YT-DLP++ downloads its media engines (yt-dlp, FFmpeg, Deno) on first use, with your confirmation.\n' >> notes.md
           cat notes.md
       - name: Create draft release
         env:

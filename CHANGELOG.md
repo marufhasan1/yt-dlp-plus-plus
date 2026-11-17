@@ -62,7 +62,7 @@ First public release.
 
 ### Distribution
 
-- Windows installer (x64 and ARM64 in one file) and portable build; macOS DMG and ZIP (Intel
-  and Apple silicon); Linux AppImage, DEB and RPM (x64 and ARM64).
+- Windows installer (x64 and ARM64 in one file) and portable x64 build. This release is
+  Windows-only; macOS and Linux packages will follow in a later release.
 - `SHA256SUMS.txt` with every release; full license texts for all bundled components in the
   app.

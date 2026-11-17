@@ -28,8 +28,11 @@ Download the file for your system from the project's GitHub Releases page:
 | --- | --- |
 | Windows 10/11 (x64 or ARM64) | `yt-dlp-plus-plus-<version>-setup.exe` (installer; updates itself) |
 | Windows, without installing | `yt-dlp-plus-plus-<version>-portable-x64.exe` (does not update itself) |
-| macOS (Intel or Apple silicon) | `yt-dlp-plus-plus-<version>-x64.dmg` or `yt-dlp-plus-plus-<version>-arm64.dmg` |
-| Linux (x64 or ARM64) | `.AppImage` (updates itself), `.deb` or `.rpm` (command: `yt-dlp-plus-plus`) |
+| macOS (Intel or Apple silicon) | Not released yet — `yt-dlp-plus-plus-<version>-x64.dmg` / `-arm64.dmg` once available |
+| Linux (x64 or ARM64) | Not released yet — `.AppImage` (updates itself), `.deb` or `.rpm` (command: `yt-dlp-plus-plus`) once available |
+
+Version 1.0.0 is released for Windows only. The app is cross-platform, but the macOS and
+Linux builds are held back until their automated tests pass.
 
 Download files use the name `yt-dlp-plus-plus`, because `+` is not safe in download links
 and Linux package names; the installed app is called YT-DLP++.
@@ -285,11 +288,14 @@ Playwright application tests, and an unpacked package checked by `verify-package
 2. Commit, then tag and push: `git tag v1.0.0 && git push origin v1.0.0`.
 3. `.github/workflows/release.yml` checks that the tag matches `package.json` and the
    changelog, runs type-check, lint, tests, the license check and `npm audit` for production
-   dependencies, then builds the Windows, macOS and Linux packages on their own runners,
-   verifies them, and creates a **draft** GitHub Release with the installers, the
+   dependencies (on Windows), then builds the packages, verifies them, and creates a **draft** GitHub Release with the installers, the
    `latest*.yml` update manifests, blockmaps and `SHA256SUMS.txt`. The release notes come
    from the changelog.
 4. Review the draft and publish it. Only published releases reach the in-app updater.
+
+Releases are currently **Windows-only**: the build matrix in `release.yml` lists Windows,
+with the macOS and Linux entries commented out. Uncomment them once CI passes on those
+systems.
 
 Signing credentials live only in the repository's Actions secrets. All are optional; without
 them the packages are unsigned:
